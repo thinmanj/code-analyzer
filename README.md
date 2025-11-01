@@ -115,6 +115,41 @@ Code Analyzer is a comprehensive tool that reads source code, understands its st
 
 **Usage**: `--intelligence --track-trends` generates INTELLIGENCE.md (238-287 lines)
 
+### 🤖 AI-Powered Features (v0.8.0)
+
+**NEW**: Natural language search and LLM-powered code understanding:
+
+15. **🔍 Natural Language Search** - Query codebase in plain English
+    - Search functions, classes, and modules using natural language
+    - Pattern matching for common intents (HTTP, database, validation)
+    - Keyword-based semantic scoring
+    - CLI: `code-analyzer search . "functions that handle requests"`
+
+16. **🤖 LLM Integration** - AI-powered code analysis
+    - Explain complex code snippets in plain English
+    - Summarize modules and their purpose
+    - Answer questions about your codebase
+    - Generate comprehensive documentation
+    - Support for OpenAI (GPT-4) and Anthropic (Claude 3.5)
+    - CLI: `code-analyzer llm . --question "What does the auth module do?"`
+
+**Usage**:
+```bash
+# Search codebase
+code-analyzer search /path/to/project "database connection classes"
+
+# Ask questions (requires API key)
+code-analyzer llm /path/to/project --question "How does authentication work?"
+
+# Explain a module
+code-analyzer llm /path/to/project --explain-module auth_handler
+
+# Generate AI documentation
+code-analyzer llm /path/to/project --generate-docs
+```
+
+**Setup**: Set `OPENAI_API_KEY` or `ANTHROPIC_API_KEY` environment variable
+
 ### Integration & Extensibility
 - 🔌 **Plugin System**: Extensible architecture for custom analyzers and rules
 - 📚 **Code Library**: Learn from classified code examples (excellent/good/smelly/bad patterns)
