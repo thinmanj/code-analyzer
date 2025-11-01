@@ -458,6 +458,37 @@ def _result_to_dict(result):
 
 @main.command()
 @click.argument("project_path", type=click.Path(exists=True))
+def languages(project_path):
+    """Detect languages used in the project.
+    
+    Examples:
+      code-analyzer languages .
+      code-analyzer languages /path/to/project
+    """
+    from .language_detection import LanguageDetector, format_language_stats
+    
+    console.print("[bold blue]🌍 Detecting Languages...[/bold blue]\n")
+    
+    detector = LanguageDetector()
+    stats = detector.detect_languages(Path(project_path))
+    
+    if stats:
+        output = format_language_stats(stats)
+        console.print(output)
+        
+        # Show multi-language status
+        if detector.is_multi_language(Path(project_path)):
+            console.print("[yellow]⚠️  This is a multi-language project[/yellow]")
+            console.print("[dim]Note: Full analysis currently supports Python. Other languages coming soon.[/dim]")
+        else:
+            primary = detector.get_primary_language(Path(project_path))
+            console.print(f"[green]✅ Single-language project: {primary.title()}[/green]")
+    else:
+        console.print("[yellow]No programming languages detected.[/yellow]")
+
+
+@main.command()
+@click.argument("project_path", type=click.Path(exists=True))
 @click.argument("query", type=str)
 @click.option("--limit", default=10, help="Maximum number of results")
 def search(project_path, query, limit):
