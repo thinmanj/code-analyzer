@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="code-analyzer",
-    version="0.2.1",
+    version="0.4.0",
     author="Julio",
     description="Deep source code analysis and documentation tool",
     long_description=long_description,
