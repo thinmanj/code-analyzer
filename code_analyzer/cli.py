@@ -147,7 +147,8 @@ def analyze(project_path, depth, logseq_graph, create_tickets, generate_docs, ou
             onboarding_report = format_enhanced_onboarding(
                 insights, 
                 project_root=str(Path(project_path).resolve()),
-                modules=result.modules
+                modules=result.modules,
+                issues=result.issues
             )
         else:
             onboarding_report = format_onboarding_report(insights)

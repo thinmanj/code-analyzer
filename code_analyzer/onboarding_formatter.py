@@ -8,6 +8,9 @@ from .why_docs import WhyDocsExtractor, format_why_section
 from .interactive_examples import InteractiveExamplesGenerator, format_example
 from .workflows import WorkflowsGenerator, format_workflow
 from .architecture_diagrams import format_architecture_diagrams
+from .troubleshooting import format_troubleshooting_playbook
+from .glossary import format_glossary
+from .edge_cases import format_edge_cases
 
 
 def generate_editor_links(file_path: str, line: int, project_root: str = None) -> dict:
@@ -498,7 +501,7 @@ def format_debugging_guide(insights: OnboardingInsights) -> str:
     return "\n".join(output)
 
 
-def format_enhanced_onboarding(insights: OnboardingInsights, project_root: str = None, modules: list = None) -> str:
+def format_enhanced_onboarding(insights: OnboardingInsights, project_root: str = None, modules: list = None, issues: list = None) -> str:
     """Generate enhanced onboarding report with code snapshots and editor links."""
     sections = []
     
@@ -545,6 +548,25 @@ def format_enhanced_onboarding(insights: OnboardingInsights, project_root: str =
         sections.append(format_architecture_diagrams(modules))
         sections.append("")
     
+    # Troubleshooting playbook (Phase 2)
+    if issues:
+        sections.append(format_troubleshooting_playbook(issues))
+        sections.append("")
+    
+    # Glossary (Phase 2)
+    if modules:
+        glossary_section = format_glossary(modules, insights.overview.name)
+        if glossary_section:
+            sections.append(glossary_section)
+            sections.append("")
+    
+    # Edge cases (Phase 2)
+    if modules:
+        edge_cases_section = format_edge_cases(modules)
+        if edge_cases_section:
+            sections.append(edge_cases_section)
+            sections.append("")
+    
     # Common workflows
     if modules:
         sections.append(format_common_workflows(insights, modules))
@@ -580,3 +602,4 @@ def format_enhanced_onboarding(insights: OnboardingInsights, project_root: str =
     sections.append("=" * 80)
     
     return "\n\n".join(sections)
+
