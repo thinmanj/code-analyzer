@@ -102,7 +102,7 @@ class CallGraphBuilder:
         lines.append("└─────────────────────────────────────────────────────────────┘")
         return lines
     
-    def find_hot_paths(self) -> List[Tuple[str, int]]:
+    def find_hot_paths(self, top_n: int = 10) -> List[Tuple[str, int]]:
         """Find most-called functions (hotspots)."""
         call_counts = defaultdict(int)
         
@@ -112,7 +112,7 @@ class CallGraphBuilder:
         
         # Sort by call count
         sorted_funcs = sorted(call_counts.items(), key=lambda x: x[1], reverse=True)
-        return sorted_funcs[:10]
+        return sorted_funcs[:top_n]
     
     def generate_data_flow_diagram(self) -> List[str]:
         """Generate data flow diagram showing how data moves through the system."""

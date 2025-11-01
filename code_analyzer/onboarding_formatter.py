@@ -223,6 +223,95 @@ def format_learning_roadmap(insights: OnboardingInsights) -> str:
     return "\n".join(output)
 
 
+def format_call_graph_section(insights: OnboardingInsights, modules: list) -> str:
+    """Format call graph visualization section."""
+    output = []
+    
+    output.append("# 🔄 CALL GRAPH & DATA FLOW")
+    output.append("=" * 80)
+    output.append("")
+    output.append("Understanding how functions call each other helps you navigate the codebase.")
+    output.append("")
+    
+    # Build call graph from modules
+    if not modules:
+        output.append("_No call graph data available_")
+        return "\n".join(output)
+    
+    try:
+        builder = CallGraphBuilder(modules)
+        
+        # System flow diagram
+        output.append("## System Flow Overview")
+        output.append("")
+        output.append("```")
+        flow_diagram = builder.generate_flow_diagram()
+        output.extend(flow_diagram)
+        output.append("```")
+        output.append("")
+        
+        # Data flow
+        output.append("## Data Transformation Pipeline")
+        output.append("")
+        output.append("```")
+        data_flow = builder.generate_data_flow_diagram()
+        output.extend(data_flow)
+        output.append("```")
+        output.append("")
+        
+        # Entry point call trees
+        output.append("## Entry Points & Call Trees")
+        output.append("")
+        output.append("Start here to understand execution flow:")
+        output.append("")
+        
+        entry_points = ['main', 'analyze', 'run', 'execute', 'process', 'start']
+        found_entries = [ep for ep in entry_points if ep in builder.call_map]
+        
+        if found_entries:
+            for entry in found_entries[:3]:  # Show top 3
+                output.append(f"### {entry}()")
+                output.append("```")
+                call_tree = builder.generate_call_tree(entry, max_depth=3)
+                output.extend(call_tree)
+                output.append("```")
+                output.append("")
+        else:
+            output.append("_No standard entry points detected_")
+            output.append("")
+        
+        # Hot paths
+        output.append("## Most-Called Functions (Hot Paths)")
+        output.append("")
+        output.append("These functions are called frequently - understand them well:")
+        output.append("")
+        
+        hot_paths = builder.find_hot_paths(top_n=8)
+        if hot_paths:
+            for func, count in hot_paths:
+                output.append(f"- **`{func}()`** - called by {count} different functions")
+        else:
+            output.append("_No hot paths detected_")
+        output.append("")
+        
+        # Module dependencies
+        output.append("## Module Dependencies")
+        output.append("")
+        output.append("How modules depend on each other:")
+        output.append("")
+        output.append("```")
+        module_deps = builder.generate_module_dependencies()
+        output.extend(module_deps[:15])  # Show top 15
+        output.append("```")
+        output.append("")
+        
+    except Exception as e:
+        output.append(f"_Call graph generation failed: {e}_")
+        output.append("")
+    
+    return "\n".join(output)
+
+
 def format_debugging_guide(insights: OnboardingInsights) -> str:
     """Format debugging and troubleshooting guide."""
     output = []
@@ -281,7 +370,7 @@ def format_debugging_guide(insights: OnboardingInsights) -> str:
     return "\n".join(output)
 
 
-def format_enhanced_onboarding(insights: OnboardingInsights, project_root: str = None) -> str:
+def format_enhanced_onboarding(insights: OnboardingInsights, project_root: str = None, modules: list = None) -> str:
     """Generate enhanced onboarding report with code snapshots and editor links."""
     sections = []
     
@@ -299,6 +388,11 @@ def format_enhanced_onboarding(insights: OnboardingInsights, project_root: str =
     # Architecture deep dive
     sections.append(format_architecture_section(insights))
     sections.append("")
+    
+    # Call graph visualization (NEW)
+    if modules:
+        sections.append(format_call_graph_section(insights, modules))
+        sections.append("")
     
     # Learning roadmap
     sections.append(format_learning_roadmap(insights))

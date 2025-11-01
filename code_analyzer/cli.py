@@ -144,7 +144,11 @@ def analyze(project_path, depth, logseq_graph, create_tickets, generate_docs, ou
         
         # Use enhanced formatter if available, otherwise use basic
         if HAS_ENHANCED:
-            onboarding_report = format_enhanced_onboarding(insights, project_root=str(Path(project_path).resolve()))
+            onboarding_report = format_enhanced_onboarding(
+                insights, 
+                project_root=str(Path(project_path).resolve()),
+                modules=result.modules
+            )
         else:
             onboarding_report = format_onboarding_report(insights)
         
