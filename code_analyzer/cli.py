@@ -131,11 +131,24 @@ def analyze(project_path, depth, logseq_graph, create_tickets, generate_docs, ou
     output_dir = Path(project_path) / output
     output_dir.mkdir(parents=True, exist_ok=True)
     
+    # Generate onboarding FIRST (before Logseq docs need it)
+    onboarding_file = None
+    if onboarding:
+        onboarding_analyzer = OnboardingAnalyzer(Path(project_path))
+        insights = onboarding_analyzer.generate_insights(result.modules)
+        onboarding_report = format_onboarding_report(insights)
+        
+        # Save onboarding report
+        onboarding_file = output_dir / "ONBOARDING.md"
+        with open(onboarding_file, 'w') as f:
+            f.write(onboarding_report)
+        console.print(f"\n📚 Generated onboarding guide: {onboarding_file}")
+    
     # Generate Logseq documentation BEFORE saving new analysis (so it can compare with previous)
     if generate_docs and logseq_graph:
         project_name = Path(project_path).name
         doc_gen = LogseqDocGenerator(logseq_graph)
-        doc_gen.generate_documentation(result, project_name)
+        doc_gen.generate_documentation(result, project_name, onboarding_path=onboarding_file)
     
     # Track trends
     if track_trends:
@@ -164,21 +177,10 @@ def analyze(project_path, depth, logseq_graph, create_tickets, generate_docs, ou
         tickets_mgr = TicketsManager(project_path)
         tickets_mgr.create_epic_and_tickets(result, project_name)
     
-    # Generate onboarding report
-    if onboarding:
-        onboarding_analyzer = OnboardingAnalyzer(Path(project_path))
-        insights = onboarding_analyzer.generate_insights(result.modules)
-        onboarding_report = format_onboarding_report(insights)
-        
-        # Save onboarding report
-        onboarding_file = output_dir / "ONBOARDING.md"
-        with open(onboarding_file, 'w') as f:
-            f.write(onboarding_report)
-        console.print(f"\n📚 Saved onboarding guide to: {onboarding_file}")
-        
-        # Also print it to console
+    # Print onboarding report to console if generated
+    if onboarding and onboarding_file:
         console.print("\n" + "=" * 80)
-        console.print(onboarding_report)
+        console.print(onboarding_file.read_text())
     
     # Generate auto-fixes
     if auto_fix:

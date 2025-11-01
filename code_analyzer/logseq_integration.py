@@ -37,13 +37,14 @@ class LogseqDocGenerator:
             self.client = None
             print("⚠️  Logseq client not available. Documentation will be generated as markdown only.")
     
-    def generate_documentation(self, result: AnalysisResult, project_name: str):
+    def generate_documentation(self, result: AnalysisResult, project_name: str, onboarding_path: Path = None):
         """
         Generate complete documentation for analysis results.
         
         Args:
             result: Analysis result to document
             project_name: Name of the project being analyzed
+            onboarding_path: Optional path to ONBOARDING.md file to include
         """
         print(f"📚 Generating Logseq documentation for {project_name}...")
         
@@ -74,6 +75,10 @@ class LogseqDocGenerator:
         # Create top findings page (summary)
         self._create_top_findings_page(result, project_name)
         
+        # Create onboarding page if available
+        if onboarding_path and onboarding_path.exists():
+            self._create_onboarding_page(project_name, onboarding_path)
+        
         # Create journal entry for tracking
         self._create_journal_entry(result, project_name)
         
@@ -100,6 +105,7 @@ class LogseqDocGenerator:
 
 ## Analysis Sections
 - [[{project_name}/Top Findings]] 🎯 **START HERE**
+- [[{project_name}/Onboarding]] 🚀 **New Developer Guide**
 - [[{project_name}/Metrics]]
 - [[{project_name}/Critical Sections]]
 - [[{project_name}/Important Sections]] ⭐
@@ -492,6 +498,43 @@ Code sections that need updates, refactoring, or enhancements.
                 content += f"   - Location: `{qw['location']}`\n\n"
         
         self._write_page(page_title, content)
+    
+    def _create_onboarding_page(self, project_name: str, onboarding_path: Path):
+        """Create onboarding guide page from ONBOARDING.md."""
+        page_title = f"{project_name}/Onboarding"
+        
+        try:
+            onboarding_content = onboarding_path.read_text()
+            
+            # Convert to Logseq format (add bullet points)
+            lines = onboarding_content.split('\n')
+            formatted_lines = []
+            
+            for line in lines:
+                if line.strip():
+                    # Headers
+                    if line.startswith('#'):
+                        # Convert markdown headers to Logseq format
+                        level = len(line) - len(line.lstrip('#'))
+                        text = line.lstrip('#').strip()
+                        formatted_lines.append('- ' + '#' * level + ' ' + text)
+                    # Horizontal rules
+                    elif line.strip().startswith('---') or line.strip().startswith('==='):
+                        formatted_lines.append('')
+                    # List items (already have bullets or numbers)
+                    elif line.strip().startswith(('-', '*', '\u2022')) or (len(line) > 0 and line.strip()[0].isdigit() and '.' in line[:5]):
+                        formatted_lines.append('  ' + line.strip())
+                    # Regular text
+                    else:
+                        formatted_lines.append('- ' + line.strip())
+                else:
+                    formatted_lines.append('')
+            
+            content = '\n'.join(formatted_lines)
+            self._write_page(page_title, content)
+            
+        except Exception as e:
+            print(f"   ⚠️  Could not create onboarding page: {e}")
     
     def _write_page(self, title: str, content: str):
         """Write a page to Logseq."""

@@ -2,7 +2,7 @@
 
 ## Overview
 - **Analysis Period**: 2025-10-31 to 2025-10-31
-- **Data Points**: 2
+- **Data Points**: 3
 
 ## Key Metrics Trends
 
@@ -30,3 +30,5 @@
 
 ## Sparkline Trends
 
+**Issues**: ▄▄▄
+**Complexity**: ▄▄▄

@@ -1,11 +1,11 @@
 {
   "project_path": "/Volumes/Projects/code-analyzer",
-  "analysis_date": "2025-10-31T23:11:54.610861",
+  "analysis_date": "2025-10-31T23:35:25.944769",
   "metrics": {
     "total_files": 26,
-    "total_lines": 8184,
+    "total_lines": 8229,
     "total_classes": 86,
-    "total_functions": 324,
+    "total_functions": 325,
     "total_issues": 17,
     "issues_by_severity": {
       "medium": 10,
@@ -18,8 +18,8 @@
       "code_smell": 2,
       "conceptual": 1
     },
-    "average_complexity": 2.8333333333333335,
-    "max_complexity": 25
+    "average_complexity": 2.852307692307692,
+    "max_complexity": 26
   },
   "issues": [
     {
@@ -78,12 +78,12 @@
       "type": "complexity",
       "severity": "high",
       "title": "High complexity in analyze",
-      "description": "Function has cyclomatic complexity of 25",
-      "location": "code_analyzer/cli.py:61-224 in analyze()",
+      "description": "Function has cyclomatic complexity of 26",
+      "location": "code_analyzer/cli.py:61-226 in analyze()",
       "recommendation": "Consider breaking this function into smaller, more focused functions",
       "code_snippet": null,
       "metadata": {
-        "complexity": 25
+        "complexity": 26
       },
       "fingerprint": "6bdee6a897458a09"
     },
@@ -181,17 +181,6 @@
     {
       "type": "unused_code",
       "severity": "low",
-      "title": "Potentially unused function: test_quality_levels",
-      "description": "This function is not called anywhere in the codebase",
-      "location": "examples/test_plugins.py:130-160 in test_quality_levels()",
-      "recommendation": "Consider removing if truly unused, or document its external usage",
-      "code_snippet": null,
-      "metadata": {},
-      "fingerprint": "1c146925e841a107"
-    },
-    {
-      "type": "unused_code",
-      "severity": "low",
       "title": "Potentially unused function: create_default_library",
       "description": "This function is not called anywhere in the codebase",
       "location": "code_analyzer/code_library.py:353-449 in create_default_library()",
@@ -201,11 +190,22 @@
       "fingerprint": "0fc30758ef758a2e"
     },
     {
+      "type": "unused_code",
+      "severity": "low",
+      "title": "Potentially unused function: test_quality_levels",
+      "description": "This function is not called anywhere in the codebase",
+      "location": "examples/test_plugins.py:130-160 in test_quality_levels()",
+      "recommendation": "Consider removing if truly unused, or document its external usage",
+      "code_snippet": null,
+      "metadata": {},
+      "fingerprint": "1c146925e841a107"
+    },
+    {
       "type": "code_smell",
       "severity": "medium",
       "title": "Long parameter list in analyze",
       "description": "Function has 15 parameters",
-      "location": "code_analyzer/cli.py:61-224 in analyze()",
+      "location": "code_analyzer/cli.py:61-226 in analyze()",
       "recommendation": "Consider using a configuration object or builder pattern",
       "code_snippet": null,
       "metadata": {},
@@ -249,8 +249,8 @@
     },
     {
       "name": "code_analyzer.cli.analyze",
-      "location": "code_analyzer/cli.py:61-224 in analyze()",
-      "reason": "High complexity (25)",
+      "location": "code_analyzer/cli.py:61-226 in analyze()",
+      "reason": "High complexity (26)",
       "risk_level": "high"
     },
     {
@@ -267,8 +267,8 @@
     },
     {
       "name": "code_analyzer.logseq_integration.LogseqDocGenerator",
-      "location": "code_analyzer/logseq_integration.py:23-609 [LogseqDocGenerator]",
-      "reason": "Large class (18 methods)",
+      "location": "code_analyzer/logseq_integration.py:23-652 [LogseqDocGenerator]",
+      "reason": "Large class (19 methods)",
       "risk_level": "medium"
     },
     {
@@ -390,7 +390,7 @@
     },
     {
       "name": "code_analyzer.cli.analyze",
-      "location": "code_analyzer/cli.py:61-224 in analyze()",
+      "location": "code_analyzer/cli.py:61-226 in analyze()",
       "category": "api",
       "importance": "high",
       "description": "API endpoint handler: analyze",
@@ -398,7 +398,7 @@
     },
     {
       "name": "code_analyzer.cli.report",
-      "location": "code_analyzer/cli.py:257-309 in report()",
+      "location": "code_analyzer/cli.py:259-311 in report()",
       "category": "api",
       "importance": "high",
       "description": "API endpoint handler: report",
@@ -406,7 +406,7 @@
     },
     {
       "name": "code_analyzer.cli._display_summary",
-      "location": "code_analyzer/cli.py:312-344 in _display_summary()",
+      "location": "code_analyzer/cli.py:314-346 in _display_summary()",
       "category": "api",
       "importance": "high",
       "description": "API endpoint handler: _display_summary",
@@ -414,7 +414,7 @@
     },
     {
       "name": "code_analyzer.cli._result_to_dict",
-      "location": "code_analyzer/cli.py:347-386 in _result_to_dict()",
+      "location": "code_analyzer/cli.py:349-388 in _result_to_dict()",
       "category": "api",
       "importance": "high",
       "description": "API endpoint handler: _result_to_dict",
@@ -422,7 +422,7 @@
     },
     {
       "name": "code_analyzer.cli.analyze",
-      "location": "code_analyzer/cli.py:61-224 in analyze()",
+      "location": "code_analyzer/cli.py:61-226 in analyze()",
       "category": "business_logic",
       "importance": "high",
       "description": "Core business logic: analyze",

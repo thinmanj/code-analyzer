@@ -1,11 +1,11 @@
 ================================================================================
-ONBOARDING GUIDE: 
+ONBOARDING GUIDE: code-analyzer
 ================================================================================
 
 📋 PROJECT OVERVIEW
 --------------------------------------------------------------------------------
 Complexity: Complex
-Size: 22 files, 6,837 lines
+Size: 26 files, 8,229 lines
 
 Technologies:
   • Click (CLI framework)
@@ -15,8 +15,8 @@ Key Dependencies:
   • code_analyzer
   • rich
   • radon
+  • inspect
   • json
-  • setuptools
 
 🗺️  LEARNING PATH
 --------------------------------------------------------------------------------
@@ -28,9 +28,9 @@ Key Dependencies:
 3. Study core modules to understand main functionality:
    - code_analyzer/analyzer.py (Analysis and processing)
    - code_analyzer/anonymizer.py (Analysis and processing)
+   - code_analyzer/autofix.py (Analysis and processing)
    - code_analyzer/cli.py (Analysis and processing)
    - code_analyzer/code_library.py (Analysis and processing)
-   - code_analyzer/important_sections.py (Analysis and processing)
 5. Read tests to understand expected behavior
 
 🔑 KEY CONCEPTS
@@ -42,7 +42,7 @@ Main Classes (Top 5):
   • code_analyzer.analyzer.CodeAnalyzer: Main code analyzer that parses and analyzes Python code.
   • code_analyzer.important_sections.ImportantSectionIdentifier: Identifies important sections and patterns in code.
   • code_analyzer.improvement_detector.ImprovementDetector: Detects code that needs updates and improvements.
-  • examples.example_plugin.ExampleAdvancedPlugin: Example plugin with full custom analysis logic.
+  • code_analyzer.autofix.AutoFixGenerator: Generate automatic fixes for common code issues.
 
 🚀 QUICK START TIPS
 --------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ Main Classes (Top 5):
 
 ⚠️  COMMON PITFALLS
 --------------------------------------------------------------------------------
-  ⚠️  17 modules have high complexity - start with simpler ones
+  ⚠️  20 modules have high complexity - start with simpler ones
   ⚠️  Many dependencies - make sure you understand the core ones first
 
 💻 HELPFUL COMMANDS
