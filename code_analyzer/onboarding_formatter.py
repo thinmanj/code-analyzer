@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import List
 from .onboarding import OnboardingInsights, CodeSnapshot
 from .call_graph import CallGraphBuilder
+from .why_docs import WhyDocsExtractor, format_why_section
 
 
 def generate_editor_links(file_path: str, line: int, project_root: str = None) -> dict:
@@ -312,6 +313,64 @@ def format_call_graph_section(insights: OnboardingInsights, modules: list) -> st
     return "\n".join(output)
 
 
+def format_why_documentation(insights: OnboardingInsights, project_root: str = None) -> str:
+    """Format 'Why This Exists' documentation from git history."""
+    output = []
+    
+    output.append("# 🎯 WHY THIS EXISTS")
+    output.append("=" * 80)
+    output.append("")
+    output.append("Understanding WHY code exists is as important as knowing WHAT it does.")
+    output.append("This section explains the rationale behind key components.")
+    output.append("")
+    
+    if not project_root:
+        output.append("_Git history unavailable - cannot extract component rationale_")
+        return "\n".join(output)
+    
+    try:
+        extractor = WhyDocsExtractor(Path(project_root))
+        
+        # Extract history for key modules
+        components_to_analyze = []
+        
+        # Get core modules from insights
+        if insights.learning_path.core_modules:
+            for file_path, _ in insights.learning_path.core_modules[:5]:
+                components_to_analyze.append(file_path)
+        
+        # Get entry points
+        if insights.learning_path.entry_points:
+            for file_path, _ in insights.learning_path.entry_points[:2]:
+                if file_path not in components_to_analyze:
+                    components_to_analyze.append(file_path)
+        
+        if not components_to_analyze:
+            output.append("_No key components identified for analysis_")
+            return "\n".join(output)
+        
+        output.append("## Core Components")
+        output.append("")
+        
+        histories_found = 0
+        for file_path in components_to_analyze[:6]:  # Top 6 components
+            history = extractor.extract_component_history(file_path)
+            if history:
+                why_section = format_why_section(history)
+                output.extend(why_section)
+                histories_found += 1
+        
+        if histories_found == 0:
+            output.append("_Git history not available for these components_")
+            output.append("")
+        
+    except Exception as e:
+        output.append(f"_Could not extract git history: {str(e)}_")
+        output.append("")
+    
+    return "\n".join(output)
+
+
 def format_debugging_guide(insights: OnboardingInsights) -> str:
     """Format debugging and troubleshooting guide."""
     output = []
@@ -401,6 +460,11 @@ def format_enhanced_onboarding(insights: OnboardingInsights, project_root: str =
     # Code examples
     sections.append(format_code_examples_section(insights, project_root))
     sections.append("")
+    
+    # Why this exists (git history)
+    if project_root:
+        sections.append(format_why_documentation(insights, project_root))
+        sections.append("")
     
     # Debugging guide
     sections.append(format_debugging_guide(insights))
