@@ -7,6 +7,7 @@ from .call_graph import CallGraphBuilder
 from .why_docs import WhyDocsExtractor, format_why_section
 from .interactive_examples import InteractiveExamplesGenerator, format_example
 from .workflows import WorkflowsGenerator, format_workflow
+from .architecture_diagrams import format_architecture_diagrams
 
 
 def generate_editor_links(file_path: str, line: int, project_root: str = None) -> dict:
@@ -537,6 +538,11 @@ def format_enhanced_onboarding(insights: OnboardingInsights, project_root: str =
     # Interactive examples
     if modules:
         sections.append(format_interactive_examples(insights, insights.overview.name, modules))
+        sections.append("")
+    
+    # Architecture diagrams (Phase 2)
+    if modules:
+        sections.append(format_architecture_diagrams(modules))
         sections.append("")
     
     # Common workflows
