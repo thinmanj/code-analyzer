@@ -17,17 +17,21 @@ from .important_sections import ImportantSectionIdentifier
 from .improvement_detector import ImprovementDetector
 from .plugins import PluginManager
 from .code_library import CodeLibrary, PatternMatcher, create_default_library
+from .base_analyzer import LanguageAnalyzer
+from .js_analyzer import JavaScriptAnalyzer
+from .language_detection import LanguageDetector
 
 
 class CodeAnalyzer:
-    """Main code analyzer that parses and analyzes Python code."""
+    """Main code analyzer that supports multiple programming languages."""
     
     def __init__(self, project_path: str, ignore_patterns: Optional[List[str]] = None,
-                 plugin_dir: Optional[Path] = None, code_library_path: Optional[Path] = None):
+                 plugin_dir: Optional[Path] = None, code_library_path: Optional[Path] = None,
+                 languages: Optional[List[str]] = None):
         """Initialize analyzer with project path."""
         self.project_path = Path(project_path).resolve()
         self.ignore_patterns = ignore_patterns or [
-            "*/venv/*", "*/env/*", "*/.venv/*",
+            "*/venv/*", "*/env/*", "*/.venv/*", "*/node_modules/*",
             "*/migrations/*", "*/build/*", "*/dist/*",
             "*/.git/*", "*/__pycache__/*", "*.egg-info/*"
         ]
@@ -35,6 +39,14 @@ class CodeAnalyzer:
         self.issues: List[Issue] = []
         self.critical_sections: List[CriticalSection] = []
         self.call_graph: Dict[str, Set[str]] = {}
+        
+        # Language detection and analyzers
+        self.language_detector = LanguageDetector()
+        self.language_analyzers: Dict[str, LanguageAnalyzer] = {}
+        self.enabled_languages = languages or ['python', 'javascript', 'typescript']  # Default enabled
+        
+        # Register language analyzers
+        self._register_language_analyzers()
         
         # Plugin system
         self.plugin_manager = PluginManager()
@@ -53,6 +65,22 @@ class CodeAnalyzer:
             print(f"📚 Creating default code library")
             self.code_library = create_default_library()
             self.pattern_matcher = PatternMatcher(self.code_library)
+    
+    def _register_language_analyzers(self):
+        """Register available language analyzers."""
+        # JavaScript/TypeScript analyzer
+        if any(lang in self.enabled_languages for lang in ['javascript', 'typescript']):
+            js_analyzer = JavaScriptAnalyzer()
+            for ext in js_analyzer.get_supported_extensions():
+                self.language_analyzers[ext] = js_analyzer
+        
+        # Python analyzer is handled separately (legacy code)
+        # Future: refactor to use LanguageAnalyzer interface
+    
+    def _get_analyzer_for_file(self, file_path: Path) -> Optional[LanguageAnalyzer]:
+        """Get the appropriate analyzer for a file based on its extension."""
+        ext = file_path.suffix
+        return self.language_analyzers.get(ext)
         
     def analyze(self, depth: str = "deep") -> AnalysisResult:
         """
@@ -66,18 +94,19 @@ class CodeAnalyzer:
         """
         print(f"🔍 Analyzing project: {self.project_path}")
         print(f"   Depth: {depth}")
+        print(f"   Languages: {', '.join(self.enabled_languages)}")
         
-        # Find all Python files
-        python_files = self._find_python_files()
-        print(f"   Found {len(python_files)} Python files")
+        # Find all source files (all languages)
+        source_files = self._find_source_files()
+        print(f"   Found {len(source_files)} source files")
         
         # Run pre-analysis hooks
         self.plugin_manager.run_pre_analysis_hooks([])
         
         # Analyze each file with progress bar
-        for file_path in tqdm(python_files, desc="📄 Analyzing files", unit="file"):
+        for file_path in tqdm(source_files, desc="📄 Analyzing files", unit="file"):
             try:
-                module_info = self._analyze_file(file_path)
+                module_info = self._analyze_any_file(file_path)
                 if module_info:
                     self.modules.append(module_info)
             except Exception as e:
@@ -163,8 +192,29 @@ class CodeAnalyzer:
             improvements=improvements
         )
     
+    def _find_source_files(self) -> List[Path]:
+        """Find all source files for enabled languages in the project."""
+        source_files = []
+        
+        # Build list of extensions to search for
+        extensions = ['.py', '.pyi']  # Always include Python
+        for analyzer in self.language_analyzers.values():
+            extensions.extend(analyzer.get_supported_extensions())
+        extensions = list(set(extensions))  # Remove duplicates
+        
+        for root, dirs, files in os.walk(self.project_path):
+            # Filter out ignored directories
+            dirs[:] = [d for d in dirs if not self._should_ignore(Path(root) / d)]
+            
+            for file in files:
+                file_path = Path(root) / file
+                if file_path.suffix in extensions and not self._should_ignore(file_path):
+                    source_files.append(file_path)
+        
+        return source_files
+    
     def _find_python_files(self) -> List[Path]:
-        """Find all Python files in the project."""
+        """Find all Python files in the project (legacy method)."""
         python_files = []
         for root, dirs, files in os.walk(self.project_path):
             # Filter out ignored directories
@@ -176,6 +226,19 @@ class CodeAnalyzer:
                     if not self._should_ignore(file_path):
                         python_files.append(file_path)
         return python_files
+    
+    def _analyze_any_file(self, file_path: Path) -> Optional[ModuleInfo]:
+        """Route file to appropriate analyzer based on extension."""
+        # Check if it's a Python file (use legacy analyzer)
+        if file_path.suffix in ['.py', '.pyi']:
+            return self._analyze_file(file_path)
+        
+        # Use language-specific analyzer
+        analyzer = self._get_analyzer_for_file(file_path)
+        if analyzer:
+            return analyzer.analyze_file(file_path)
+        
+        return None
     
     def _should_ignore(self, path: Path) -> bool:
         """Check if path should be ignored."""
