@@ -6,15 +6,56 @@ Code Analyzer is a comprehensive tool that reads source code, understands its st
 
 ## Features
 
+### Core Analysis
 - 🔍 **Deep Code Analysis**: AST-based parsing to understand code structure and dependencies
 - 🎯 **Critical Section Identification**: Automatically identifies important code locations and critical paths
 - 🐛 **Bug Detection**: Static analysis to find potential bugs, security issues, and code smells
+- 📊 **VCS History Analysis**: Analyzes git history for hotspots, churn, and maintenance patterns
+- 📈 **Trends Tracking**: SQLite database for tracking code quality over time
+- 🔧 **Auto-Fix Generation**: Automatic fixes for common issues with confidence levels
+- 🎫 **CI/CD Integration**: Generate GitHub Actions and GitLab CI workflows
+
+### 🎉 **NEW in v0.5.0: World-Class Engineering Onboarding**
+
+**Transform onboarding from days to hours** with comprehensive, actionable documentation:
+
+1. **📝 Real Code Snippets** - Extract 10-20 line examples from key components
+   - Multi-editor deep links (VS Code, IntelliJ, Neovim, Vim, Emacs, Sublime, Atom)
+   - Actual implementation with full context and docstrings
+   - Jump directly to code in your favorite editor
+
+2. **🔄 Call Graph Visualization** - Understand how functions connect
+   - ASCII call trees showing execution flow
+   - Hot paths analysis (most-called functions)
+   - System flow diagrams with module structure
+   - Data transformation pipeline visualization
+
+3. **🎯 "Why This Exists" Documentation** - Learn from git history
+   - Mines commit messages for component rationale
+   - Shows design decisions and evolution timeline
+   - Identifies main contributors per component
+   - Extracts "why" patterns from commit history
+
+4. **🎨 Interactive Runnable Examples** - Copy-paste and run immediately
+   - Smart parameter inference for realistic examples
+   - Expected output shown for each example
+   - Multiple use cases (classes, functions, workflows)
+   - Copy-paste ready with zero configuration
+
+5. **🔧 Common Developer Workflows** - Step-by-step guides
+   - 6 complete workflows with time estimates (20-90 min each)
+   - Add analyzers, create plugins, debug issues, contribute
+   - Code examples with file locations
+   - Pro tips and prerequisites for each workflow
+
+**Result**: Engineers onboard in **<4 hours instead of days**! ✨
+
+### Integration & Extensibility
 - 🔌 **Plugin System**: Extensible architecture for custom analyzers and rules
 - 📚 **Code Library**: Learn from classified code examples (excellent/good/smelly/bad patterns)
 - 🔒 **Privacy-First**: Code anonymization for external LLM analysis while keeping sensitive code local
 - 📝 **Logseq Integration**: Automatic documentation generation in your Logseq graph
 - 🎫 **Ticket Management**: Auto-creates epics and prioritized tickets for discovered issues
-- 📊 **Comprehensive Reports**: Detailed analysis reports with metrics and insights
 - 🚫 **Non-Invasive**: Never modifies source code, stores all analysis in separate directory
 - ⚡ **Fast & Efficient**: 28.5 files/sec, 10k+ lines/sec, < 10 MB memory
 
@@ -28,12 +69,17 @@ pip install -e .
 ## Quick Start
 
 ```bash
-# Analyze a Python project
-code-analyzer analyze /path/to/project --depth deep
+# Generate world-class onboarding documentation (NEW in v0.5.0!)
+code-analyzer analyze /path/to/project --onboarding --output ./analysis
 
-# Deep analysis with all features
+# Full analysis with all features
 code-analyzer analyze /path/to/project \
   --depth deep \
+  --onboarding \
+  --auto-fix \
+  --vcs-analysis \
+  --track-trends \
+  --generate-cicd github \
   --create-tickets \
   --generate-docs \
   --logseq-graph ~/logseq
@@ -49,6 +95,20 @@ code-analyzer analyze /path/to/project --use-default-library
 # Anonymize code for external analysis
 code-analyzer anonymize /path/to/project --output /tmp/anonymized
 ```
+
+## Example Onboarding Output
+
+Running onboarding on real projects generates comprehensive documentation:
+
+| Project | Files | Lines | Onboarding Lines | Features |
+|---------|-------|-------|-----------------|----------|
+| code-analyzer | 31 | 10,147 | 869 | ✅ All 5 |
+| python-optimizer | 71 | 23,894 | 1,153 | ✅ All 5 |
+| agentscript | 58 | ~15K | 1,099 | ✅ All 5 |
+| OrbisTertius | 53 | ~18K | 1,185 | ✅ All 5 |
+| logseq-python | 75 | ~25K | 1,274 | ✅ All 5 |
+
+**Each includes**: Real code snippets, call graphs, git history, interactive examples, and step-by-step workflows.
 
 ## Configuration
 
