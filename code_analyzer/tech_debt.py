@@ -93,10 +93,10 @@ class TechDebtCalculator:
             items.append(DebtItem(
                 location=issue.location,
                 category=category,
-                severity=issue.severity.lower(),
+                severity=str(issue.severity.name).lower() if hasattr(issue.severity, 'name') else str(issue.severity).lower(),
                 description=issue.description,
                 effort_hours=effort,
-                impact=self._impact_from_severity(issue.severity)
+                impact=self._impact_from_severity(str(issue.severity.name) if hasattr(issue.severity, 'name') else str(issue.severity))
             ))
         
         return items

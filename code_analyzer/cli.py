@@ -63,7 +63,9 @@ def main():
               help="Store analysis in trends database")
 @click.option("--generate-cicd", type=click.Choice(["github", "gitlab", "all"]),
               help="Generate CI/CD configuration files")
-def analyze(project_path, depth, logseq_graph, create_tickets, generate_docs, output, config, plugins, code_library, use_default_library, onboarding, auto_fix, vcs_analysis, track_trends, generate_cicd):
+@click.option("--intelligence", is_flag=True,
+              help="Generate intelligence reports (trends, debt, performance, security, coverage)")
+def analyze(project_path, depth, logseq_graph, create_tickets, generate_docs, output, config, plugins, code_library, use_default_library, onboarding, auto_fix, vcs_analysis, track_trends, generate_cicd, intelligence):
     """Analyze a Python project."""
     console.print("[bold blue]🔍 Code Analyzer[/bold blue]")
     console.print(f"Project: {project_path}\n")
@@ -237,6 +239,57 @@ def analyze(project_path, depth, logseq_graph, create_tickets, generate_docs, ou
         cicd_files = generate_all_cicd(Path(project_path), generate_cicd)
         for file in cicd_files:
             console.print(f"   ✅ Created: {file}")
+    
+    # Intelligence reports (Phase 3)
+    if intelligence:
+        console.print("\n🧠 Generating intelligence reports...")
+        from .quality_trends import format_quality_trends
+        from .tech_debt import format_tech_debt_report
+        from .performance import format_performance_report
+        from .security import format_security_report
+        from .coverage_analysis import format_coverage_report
+        
+        intel_file = output_dir / "INTELLIGENCE.md"
+        intel_sections = []
+        
+        # Quality trends (if trends available)
+        if track_trends or (output_dir / "trends.db").exists():
+            trends_db = TrendsDatabase(output_dir / "trends.db")
+            trends_report = format_quality_trends(str(Path(project_path).resolve()), trends_db, days=90)
+            if trends_report:
+                intel_sections.append(trends_report)
+                console.print("   ✅ Quality trends analysis")
+        
+        # Technical debt
+        debt_report = format_tech_debt_report(result.modules, result.issues)
+        if debt_report:
+            intel_sections.append(debt_report)
+            console.print("   ✅ Technical debt analysis")
+        
+        # Performance hotspots
+        perf_report = format_performance_report(result.modules)
+        if perf_report:
+            intel_sections.append(perf_report)
+            console.print("   ✅ Performance hotspots")
+        
+        # Security & dependencies
+        security_report = format_security_report(Path(project_path))
+        if security_report:
+            intel_sections.append(security_report)
+            console.print("   ✅ Security & dependency scan")
+        
+        # Test coverage
+        module_complexity = {m.name: int(sum(f.complexity for f in m.functions) / max(len(m.functions), 1)) for m in result.modules}
+        coverage_report = format_coverage_report(Path(project_path), module_complexity)
+        if coverage_report:
+            intel_sections.append(coverage_report)
+            console.print("   ✅ Test coverage analysis")
+        
+        # Write combined report
+        if intel_sections:
+            with open(intel_file, 'w') as f:
+                f.write("\n\n".join(intel_sections))
+            console.print(f"\n🧠 Generated intelligence report: {intel_file}")
     
     console.print("\n[bold green]✅ Analysis complete![/bold green]")
 
