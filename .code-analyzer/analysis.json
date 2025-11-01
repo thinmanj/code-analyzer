@@ -1,11 +1,11 @@
 {
   "project_path": "/Volumes/Projects/code-analyzer",
-  "analysis_date": "2025-10-31T23:35:25.944769",
+  "analysis_date": "2025-10-31T23:41:39.647223",
   "metrics": {
-    "total_files": 26,
-    "total_lines": 8229,
-    "total_classes": 86,
-    "total_functions": 325,
+    "total_files": 27,
+    "total_lines": 8592,
+    "total_classes": 87,
+    "total_functions": 332,
     "total_issues": 17,
     "issues_by_severity": {
       "medium": 10,
@@ -18,8 +18,8 @@
       "code_smell": 2,
       "conceptual": 1
     },
-    "average_complexity": 2.852307692307692,
-    "max_complexity": 26
+    "average_complexity": 2.88855421686747,
+    "max_complexity": 27
   },
   "issues": [
     {
@@ -78,79 +78,79 @@
       "type": "complexity",
       "severity": "high",
       "title": "High complexity in analyze",
-      "description": "Function has cyclomatic complexity of 26",
-      "location": "code_analyzer/cli.py:61-226 in analyze()",
+      "description": "Function has cyclomatic complexity of 27",
+      "location": "code_analyzer/cli.py:66-236 in analyze()",
       "recommendation": "Consider breaking this function into smaller, more focused functions",
       "code_snippet": null,
       "metadata": {
-        "complexity": 26
+        "complexity": 27
       },
-      "fingerprint": "6bdee6a897458a09"
+      "fingerprint": "b264df7e35928555"
     },
     {
       "type": "complexity",
       "severity": "high",
       "title": "High complexity in format_onboarding_report",
       "description": "Function has cyclomatic complexity of 16",
-      "location": "code_analyzer/onboarding.py:433-516 in format_onboarding_report()",
+      "location": "code_analyzer/onboarding.py:447-530 in format_onboarding_report()",
       "recommendation": "Consider breaking this function into smaller, more focused functions",
       "code_snippet": null,
       "metadata": {
         "complexity": 16
       },
-      "fingerprint": "21875d949f76f776"
+      "fingerprint": "e1b11b43a0c4edca"
     },
     {
       "type": "complexity",
       "severity": "high",
       "title": "High complexity in _analyze_project_overview",
       "description": "Function has cyclomatic complexity of 17",
-      "location": "code_analyzer/onboarding.py:80-149 in _analyze_project_overview() [OnboardingAnalyzer]",
+      "location": "code_analyzer/onboarding.py:94-163 in _analyze_project_overview() [OnboardingAnalyzer]",
       "recommendation": "Consider breaking this function into smaller, more focused functions",
       "code_snippet": null,
       "metadata": {
         "complexity": 17
       },
-      "fingerprint": "29e09d921aa22d2c"
+      "fingerprint": "55bd47f5700ea0ef"
     },
     {
       "type": "complexity",
       "severity": "medium",
       "title": "Moderate complexity in _generate_learning_path",
       "description": "Function has cyclomatic complexity of 14",
-      "location": "code_analyzer/onboarding.py:151-207 in _generate_learning_path() [OnboardingAnalyzer]",
+      "location": "code_analyzer/onboarding.py:165-221 in _generate_learning_path() [OnboardingAnalyzer]",
       "recommendation": "Consider simplifying this function",
       "code_snippet": null,
       "metadata": {
         "complexity": 14
       },
-      "fingerprint": "4a59dceaeb7837fa"
+      "fingerprint": "048ea1ae677cd52e"
     },
     {
       "type": "complexity",
       "severity": "medium",
       "title": "Moderate complexity in _infer_module_purpose",
       "description": "Function has cyclomatic complexity of 14",
-      "location": "code_analyzer/onboarding.py:209-245 in _infer_module_purpose() [OnboardingAnalyzer]",
+      "location": "code_analyzer/onboarding.py:223-259 in _infer_module_purpose() [OnboardingAnalyzer]",
       "recommendation": "Consider simplifying this function",
       "code_snippet": null,
       "metadata": {
         "complexity": 14
       },
-      "fingerprint": "d76c6bfdf11501eb"
+      "fingerprint": "56be2216df49b070"
     },
     {
       "type": "complexity",
       "severity": "high",
       "title": "High complexity in _identify_key_concepts",
       "description": "Function has cyclomatic complexity of 21",
-      "location": "code_analyzer/onboarding.py:247-325 in _identify_key_concepts() [OnboardingAnalyzer]",
+      "location": "code_analyzer/onboarding.py:261-339 in _identify_key_concepts() [OnboardingAnalyzer]",
       "recommendation": "Consider breaking this function into smaller, more focused functions",
       "code_snippet": null,
       "metadata": {
         "complexity": 21
       },
-      "fingerprint": "fb705376bcac7b0b"
+      "fingerprint": "7861f55a391e924f"
     },
     {
       "type": "complexity",
@@ -181,17 +181,6 @@
     {
       "type": "unused_code",
       "severity": "low",
-      "title": "Potentially unused function: create_default_library",
-      "description": "This function is not called anywhere in the codebase",
-      "location": "code_analyzer/code_library.py:353-449 in create_default_library()",
-      "recommendation": "Consider removing if truly unused, or document its external usage",
-      "code_snippet": null,
-      "metadata": {},
-      "fingerprint": "0fc30758ef758a2e"
-    },
-    {
-      "type": "unused_code",
-      "severity": "low",
       "title": "Potentially unused function: test_quality_levels",
       "description": "This function is not called anywhere in the codebase",
       "location": "examples/test_plugins.py:130-160 in test_quality_levels()",
@@ -201,15 +190,26 @@
       "fingerprint": "1c146925e841a107"
     },
     {
+      "type": "unused_code",
+      "severity": "low",
+      "title": "Potentially unused function: create_default_library",
+      "description": "This function is not called anywhere in the codebase",
+      "location": "code_analyzer/code_library.py:353-449 in create_default_library()",
+      "recommendation": "Consider removing if truly unused, or document its external usage",
+      "code_snippet": null,
+      "metadata": {},
+      "fingerprint": "0fc30758ef758a2e"
+    },
+    {
       "type": "code_smell",
       "severity": "medium",
       "title": "Long parameter list in analyze",
       "description": "Function has 15 parameters",
-      "location": "code_analyzer/cli.py:61-226 in analyze()",
+      "location": "code_analyzer/cli.py:66-236 in analyze()",
       "recommendation": "Consider using a configuration object or builder pattern",
       "code_snippet": null,
       "metadata": {},
-      "fingerprint": "7ffc31f52230409b"
+      "fingerprint": "e447f15cb74f957f"
     },
     {
       "type": "code_smell",
@@ -249,13 +249,13 @@
     },
     {
       "name": "code_analyzer.cli.analyze",
-      "location": "code_analyzer/cli.py:61-226 in analyze()",
-      "reason": "High complexity (26)",
+      "location": "code_analyzer/cli.py:66-236 in analyze()",
+      "reason": "High complexity (27)",
       "risk_level": "high"
     },
     {
       "name": "code_analyzer.cli.main",
-      "location": "code_analyzer/cli.py:26-28 in main()",
+      "location": "code_analyzer/cli.py:31-33 in main()",
       "reason": "Application entry point",
       "risk_level": "high"
     },
@@ -273,7 +273,7 @@
     },
     {
       "name": "code_analyzer.onboarding.format_onboarding_report",
-      "location": "code_analyzer/onboarding.py:433-516 in format_onboarding_report()",
+      "location": "code_analyzer/onboarding.py:447-530 in format_onboarding_report()",
       "reason": "High complexity (16)",
       "risk_level": "high"
     },
@@ -308,6 +308,7 @@
     "code_analyzer.logseq_integration": [],
     "code_analyzer.models": [],
     "code_analyzer.onboarding": [],
+    "code_analyzer.onboarding_formatter": [],
     "code_analyzer.plugins": [],
     "code_analyzer.tickets_integration": [],
     "code_analyzer.top_findings": [],
@@ -382,7 +383,7 @@
     },
     {
       "name": "code_analyzer.cli.main",
-      "location": "code_analyzer/cli.py:26-28 in main()",
+      "location": "code_analyzer/cli.py:31-33 in main()",
       "category": "entry_point",
       "importance": "critical",
       "description": "Application main entry point",
@@ -390,7 +391,7 @@
     },
     {
       "name": "code_analyzer.cli.analyze",
-      "location": "code_analyzer/cli.py:61-226 in analyze()",
+      "location": "code_analyzer/cli.py:66-236 in analyze()",
       "category": "api",
       "importance": "high",
       "description": "API endpoint handler: analyze",
@@ -398,7 +399,7 @@
     },
     {
       "name": "code_analyzer.cli.report",
-      "location": "code_analyzer/cli.py:259-311 in report()",
+      "location": "code_analyzer/cli.py:269-321 in report()",
       "category": "api",
       "importance": "high",
       "description": "API endpoint handler: report",
@@ -406,7 +407,7 @@
     },
     {
       "name": "code_analyzer.cli._display_summary",
-      "location": "code_analyzer/cli.py:314-346 in _display_summary()",
+      "location": "code_analyzer/cli.py:324-356 in _display_summary()",
       "category": "api",
       "importance": "high",
       "description": "API endpoint handler: _display_summary",
@@ -414,7 +415,7 @@
     },
     {
       "name": "code_analyzer.cli._result_to_dict",
-      "location": "code_analyzer/cli.py:349-388 in _result_to_dict()",
+      "location": "code_analyzer/cli.py:359-398 in _result_to_dict()",
       "category": "api",
       "importance": "high",
       "description": "API endpoint handler: _result_to_dict",
@@ -422,10 +423,50 @@
     },
     {
       "name": "code_analyzer.cli.analyze",
-      "location": "code_analyzer/cli.py:61-226 in analyze()",
+      "location": "code_analyzer/cli.py:66-236 in analyze()",
       "category": "business_logic",
       "importance": "high",
       "description": "Core business logic: analyze",
+      "pattern_type": null
+    },
+    {
+      "name": "code_analyzer.onboarding_formatter.format_code_snapshot",
+      "location": "code_analyzer/onboarding_formatter.py:28-53 in format_code_snapshot()",
+      "category": "api",
+      "importance": "high",
+      "description": "API endpoint handler: format_code_snapshot",
+      "pattern_type": null
+    },
+    {
+      "name": "code_analyzer.onboarding_formatter.format_architecture_section",
+      "location": "code_analyzer/onboarding_formatter.py:56-101 in format_architecture_section()",
+      "category": "api",
+      "importance": "high",
+      "description": "API endpoint handler: format_architecture_section",
+      "pattern_type": null
+    },
+    {
+      "name": "code_analyzer.onboarding_formatter.format_code_examples_section",
+      "location": "code_analyzer/onboarding_formatter.py:104-149 in format_code_examples_section()",
+      "category": "api",
+      "importance": "high",
+      "description": "API endpoint handler: format_code_examples_section",
+      "pattern_type": null
+    },
+    {
+      "name": "code_analyzer.onboarding_formatter.format_learning_roadmap",
+      "location": "code_analyzer/onboarding_formatter.py:152-222 in format_learning_roadmap()",
+      "category": "api",
+      "importance": "high",
+      "description": "API endpoint handler: format_learning_roadmap",
+      "pattern_type": null
+    },
+    {
+      "name": "code_analyzer.onboarding_formatter.format_debugging_guide",
+      "location": "code_analyzer/onboarding_formatter.py:225-280 in format_debugging_guide()",
+      "category": "api",
+      "importance": "high",
+      "description": "API endpoint handler: format_debugging_guide",
       "pattern_type": null
     },
     {

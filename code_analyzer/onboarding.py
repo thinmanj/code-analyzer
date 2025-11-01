@@ -32,13 +32,27 @@ class LearningPath:
 
 
 @dataclass
+class CodeSnapshot:
+    """Code snapshot with location info."""
+    file_path: str
+    line_start: int
+    line_end: int
+    code: str
+    context: str  # What this code does
+    entity_type: str  # 'class', 'function', 'pattern'
+    entity_name: str
+
+
+@dataclass
 class KeyConcepts:
     """Important concepts and patterns in the codebase."""
-    main_classes: List[Tuple[str, str]] = field(default_factory=list)  # (class, purpose)
-    core_functions: List[Tuple[str, str]] = field(default_factory=list)  # (func, role)
+    main_classes: List[Tuple[str, str, CodeSnapshot]] = field(default_factory=list)  # (class, purpose, snapshot)
+    core_functions: List[Tuple[str, str, CodeSnapshot]] = field(default_factory=list)  # (func, role, snapshot)
     design_patterns: List[str] = field(default_factory=list)
     architectural_style: Optional[str] = None
     data_flow: List[str] = field(default_factory=list)
+    architecture_diagram: List[str] = field(default_factory=list)  # ASCII art or description
+    module_interactions: List[Tuple[str, str, str]] = field(default_factory=list)  # (from, to, purpose)
 
 
 @dataclass

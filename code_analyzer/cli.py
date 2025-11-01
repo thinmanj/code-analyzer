@@ -13,6 +13,11 @@ from .logseq_integration import LogseqDocGenerator
 from .tickets_integration import TicketsManager
 from .models import IssueSeverity
 from .onboarding import OnboardingAnalyzer, format_onboarding_report
+try:
+    from .onboarding_formatter import format_enhanced_onboarding
+    HAS_ENHANCED = True
+except ImportError:
+    HAS_ENHANCED = False
 from .autofix import AutoFixGenerator
 from .vcs_analysis import VCSAnalyzer
 from .trends import TrendsDatabase, generate_trend_markdown
@@ -136,7 +141,12 @@ def analyze(project_path, depth, logseq_graph, create_tickets, generate_docs, ou
     if onboarding:
         onboarding_analyzer = OnboardingAnalyzer(Path(project_path))
         insights = onboarding_analyzer.generate_insights(result.modules)
-        onboarding_report = format_onboarding_report(insights)
+        
+        # Use enhanced formatter if available, otherwise use basic
+        if HAS_ENHANCED:
+            onboarding_report = format_enhanced_onboarding(insights, project_root=str(Path(project_path).resolve()))
+        else:
+            onboarding_report = format_onboarding_report(insights)
         
         # Save onboarding report
         onboarding_file = output_dir / "ONBOARDING.md"
