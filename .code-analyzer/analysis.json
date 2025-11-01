@@ -1,6 +1,6 @@
 {
   "project_path": "/Volumes/Projects/code-analyzer",
-  "analysis_date": "2025-10-31T23:41:39.647223",
+  "analysis_date": "2025-10-31T23:44:01.704286",
   "metrics": {
     "total_files": 27,
     "total_lines": 8592,
@@ -181,17 +181,6 @@
     {
       "type": "unused_code",
       "severity": "low",
-      "title": "Potentially unused function: test_quality_levels",
-      "description": "This function is not called anywhere in the codebase",
-      "location": "examples/test_plugins.py:130-160 in test_quality_levels()",
-      "recommendation": "Consider removing if truly unused, or document its external usage",
-      "code_snippet": null,
-      "metadata": {},
-      "fingerprint": "1c146925e841a107"
-    },
-    {
-      "type": "unused_code",
-      "severity": "low",
       "title": "Potentially unused function: create_default_library",
       "description": "This function is not called anywhere in the codebase",
       "location": "code_analyzer/code_library.py:353-449 in create_default_library()",
@@ -199,6 +188,17 @@
       "code_snippet": null,
       "metadata": {},
       "fingerprint": "0fc30758ef758a2e"
+    },
+    {
+      "type": "unused_code",
+      "severity": "low",
+      "title": "Potentially unused function: test_quality_levels",
+      "description": "This function is not called anywhere in the codebase",
+      "location": "examples/test_plugins.py:130-160 in test_quality_levels()",
+      "recommendation": "Consider removing if truly unused, or document its external usage",
+      "code_snippet": null,
+      "metadata": {},
+      "fingerprint": "1c146925e841a107"
     },
     {
       "type": "code_smell",

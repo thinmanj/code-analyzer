@@ -205,9 +205,9 @@ import ipdb; ipdb.set_trace()
 
 - `radon`
 
-- `tracemalloc`
+- `important_sections`
 
-- `tempfile`
+- `models`
 
 
 
