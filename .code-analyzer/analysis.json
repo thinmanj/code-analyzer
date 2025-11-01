@@ -1,25 +1,25 @@
 {
   "project_path": "/Volumes/Projects/code-analyzer",
-  "analysis_date": "2025-10-31T22:54:50.106963",
+  "analysis_date": "2025-10-31T23:11:54.610861",
   "metrics": {
-    "total_files": 22,
-    "total_lines": 6934,
-    "total_classes": 76,
-    "total_functions": 286,
-    "total_issues": 15,
+    "total_files": 26,
+    "total_lines": 8184,
+    "total_classes": 86,
+    "total_functions": 324,
+    "total_issues": 17,
     "issues_by_severity": {
-      "medium": 9,
-      "high": 4,
+      "medium": 10,
+      "high": 5,
       "low": 2
     },
     "issues_by_type": {
-      "complexity": 10,
+      "complexity": 12,
       "unused_code": 2,
       "code_smell": 2,
       "conceptual": 1
     },
-    "average_complexity": 2.702797202797203,
-    "max_complexity": 21
+    "average_complexity": 2.8333333333333335,
+    "max_complexity": 25
   },
   "issues": [
     {
@@ -76,16 +76,16 @@
     },
     {
       "type": "complexity",
-      "severity": "medium",
-      "title": "Moderate complexity in analyze",
-      "description": "Function has cyclomatic complexity of 14",
-      "location": "code_analyzer/cli.py:49-146 in analyze()",
-      "recommendation": "Consider simplifying this function",
+      "severity": "high",
+      "title": "High complexity in analyze",
+      "description": "Function has cyclomatic complexity of 25",
+      "location": "code_analyzer/cli.py:61-224 in analyze()",
+      "recommendation": "Consider breaking this function into smaller, more focused functions",
       "code_snippet": null,
       "metadata": {
-        "complexity": 14
+        "complexity": 25
       },
-      "fingerprint": "02d132f4dab2c6ca"
+      "fingerprint": "6bdee6a897458a09"
     },
     {
       "type": "complexity",
@@ -153,15 +153,30 @@
       "fingerprint": "fb705376bcac7b0b"
     },
     {
-      "type": "unused_code",
-      "severity": "low",
-      "title": "Potentially unused function: create_default_library",
-      "description": "This function is not called anywhere in the codebase",
-      "location": "code_analyzer/code_library.py:353-449 in create_default_library()",
-      "recommendation": "Consider removing if truly unused, or document its external usage",
+      "type": "complexity",
+      "severity": "medium",
+      "title": "Moderate complexity in _get_commits",
+      "description": "Function has cyclomatic complexity of 12",
+      "location": "code_analyzer/vcs_analysis.py:130-207 in _get_commits() [VCSAnalyzer]",
+      "recommendation": "Consider simplifying this function",
       "code_snippet": null,
-      "metadata": {},
-      "fingerprint": "0fc30758ef758a2e"
+      "metadata": {
+        "complexity": 12
+      },
+      "fingerprint": "14b6184928e60a5f"
+    },
+    {
+      "type": "complexity",
+      "severity": "medium",
+      "title": "Moderate complexity in _analyze_file_churn",
+      "description": "Function has cyclomatic complexity of 15",
+      "location": "code_analyzer/vcs_analysis.py:209-296 in _analyze_file_churn() [VCSAnalyzer]",
+      "recommendation": "Consider simplifying this function",
+      "code_snippet": null,
+      "metadata": {
+        "complexity": 15
+      },
+      "fingerprint": "4e5e038ac0b9f154"
     },
     {
       "type": "unused_code",
@@ -175,15 +190,26 @@
       "fingerprint": "1c146925e841a107"
     },
     {
+      "type": "unused_code",
+      "severity": "low",
+      "title": "Potentially unused function: create_default_library",
+      "description": "This function is not called anywhere in the codebase",
+      "location": "code_analyzer/code_library.py:353-449 in create_default_library()",
+      "recommendation": "Consider removing if truly unused, or document its external usage",
+      "code_snippet": null,
+      "metadata": {},
+      "fingerprint": "0fc30758ef758a2e"
+    },
+    {
       "type": "code_smell",
       "severity": "medium",
       "title": "Long parameter list in analyze",
-      "description": "Function has 11 parameters",
-      "location": "code_analyzer/cli.py:49-146 in analyze()",
+      "description": "Function has 15 parameters",
+      "location": "code_analyzer/cli.py:61-224 in analyze()",
       "recommendation": "Consider using a configuration object or builder pattern",
       "code_snippet": null,
       "metadata": {},
-      "fingerprint": "70aa29ea62c2b9e8"
+      "fingerprint": "7ffc31f52230409b"
     },
     {
       "type": "code_smell",
@@ -223,13 +249,13 @@
     },
     {
       "name": "code_analyzer.cli.analyze",
-      "location": "code_analyzer/cli.py:49-146 in analyze()",
-      "reason": "High complexity (14)",
-      "risk_level": "medium"
+      "location": "code_analyzer/cli.py:61-224 in analyze()",
+      "reason": "High complexity (25)",
+      "risk_level": "high"
     },
     {
       "name": "code_analyzer.cli.main",
-      "location": "code_analyzer/cli.py:22-24 in main()",
+      "location": "code_analyzer/cli.py:26-28 in main()",
       "reason": "Application entry point",
       "risk_level": "high"
     },
@@ -241,7 +267,7 @@
     },
     {
       "name": "code_analyzer.logseq_integration.LogseqDocGenerator",
-      "location": "code_analyzer/logseq_integration.py:23-604 [LogseqDocGenerator]",
+      "location": "code_analyzer/logseq_integration.py:23-609 [LogseqDocGenerator]",
       "reason": "Large class (18 methods)",
       "risk_level": "medium"
     },
@@ -273,6 +299,8 @@
     "code_analyzer": [],
     "code_analyzer.analyzer": [],
     "code_analyzer.anonymizer": [],
+    "code_analyzer.autofix": [],
+    "code_analyzer.cicd_templates": [],
     "code_analyzer.cli": [],
     "code_analyzer.code_library": [],
     "code_analyzer.important_sections": [],
@@ -283,6 +311,8 @@
     "code_analyzer.plugins": [],
     "code_analyzer.tickets_integration": [],
     "code_analyzer.top_findings": [],
+    "code_analyzer.trends": [],
+    "code_analyzer.vcs_analysis": [],
     "examples.example_plugin": [
       "code_analyzer.plugins",
       "code_analyzer.models"
@@ -343,8 +373,16 @@
       "pattern_type": "Factory"
     },
     {
+      "name": "code_analyzer.cicd_templates.generate_pre_commit_config",
+      "location": "code_analyzer/cicd_templates.py:159-164 in generate_pre_commit_config()",
+      "category": "config",
+      "importance": "medium",
+      "description": "Configuration function: generate_pre_commit_config",
+      "pattern_type": null
+    },
+    {
       "name": "code_analyzer.cli.main",
-      "location": "code_analyzer/cli.py:22-24 in main()",
+      "location": "code_analyzer/cli.py:26-28 in main()",
       "category": "entry_point",
       "importance": "critical",
       "description": "Application main entry point",
@@ -352,7 +390,7 @@
     },
     {
       "name": "code_analyzer.cli.analyze",
-      "location": "code_analyzer/cli.py:49-146 in analyze()",
+      "location": "code_analyzer/cli.py:61-224 in analyze()",
       "category": "api",
       "importance": "high",
       "description": "API endpoint handler: analyze",
@@ -360,7 +398,7 @@
     },
     {
       "name": "code_analyzer.cli.report",
-      "location": "code_analyzer/cli.py:179-231 in report()",
+      "location": "code_analyzer/cli.py:257-309 in report()",
       "category": "api",
       "importance": "high",
       "description": "API endpoint handler: report",
@@ -368,7 +406,7 @@
     },
     {
       "name": "code_analyzer.cli._display_summary",
-      "location": "code_analyzer/cli.py:234-266 in _display_summary()",
+      "location": "code_analyzer/cli.py:312-344 in _display_summary()",
       "category": "api",
       "importance": "high",
       "description": "API endpoint handler: _display_summary",
@@ -376,7 +414,7 @@
     },
     {
       "name": "code_analyzer.cli._result_to_dict",
-      "location": "code_analyzer/cli.py:269-308 in _result_to_dict()",
+      "location": "code_analyzer/cli.py:347-386 in _result_to_dict()",
       "category": "api",
       "importance": "high",
       "description": "API endpoint handler: _result_to_dict",
@@ -384,7 +422,7 @@
     },
     {
       "name": "code_analyzer.cli.analyze",
-      "location": "code_analyzer/cli.py:49-146 in analyze()",
+      "location": "code_analyzer/cli.py:61-224 in analyze()",
       "category": "business_logic",
       "importance": "high",
       "description": "Core business logic: analyze",
@@ -412,6 +450,22 @@
       "category": "business_logic",
       "importance": "high",
       "description": "Business logic class: TicketsManager",
+      "pattern_type": null
+    },
+    {
+      "name": "code_analyzer.trends.generate_trend_markdown",
+      "location": "code_analyzer/trends.py:171-231 in generate_trend_markdown()",
+      "category": "api",
+      "importance": "high",
+      "description": "API endpoint handler: generate_trend_markdown",
+      "pattern_type": null
+    },
+    {
+      "name": "code_analyzer.trends.TrendPoint",
+      "location": "code_analyzer/trends.py:14-26 [TrendPoint]",
+      "category": "api",
+      "importance": "high",
+      "description": "API handler class: TrendPoint",
       "pattern_type": null
     },
     {

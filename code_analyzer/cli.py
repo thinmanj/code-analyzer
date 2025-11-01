@@ -13,6 +13,10 @@ from .logseq_integration import LogseqDocGenerator
 from .tickets_integration import TicketsManager
 from .models import IssueSeverity
 from .onboarding import OnboardingAnalyzer, format_onboarding_report
+from .autofix import AutoFixGenerator
+from .vcs_analysis import VCSAnalyzer
+from .trends import TrendsDatabase, generate_trend_markdown
+from .cicd_templates import generate_all_cicd
 
 console = Console()
 
@@ -46,7 +50,15 @@ def main():
               help="Use built-in default code library")
 @click.option("--onboarding", is_flag=True,
               help="Generate onboarding guide for new developers")
-def analyze(project_path, depth, logseq_graph, create_tickets, generate_docs, output, config, plugins, code_library, use_default_library, onboarding):
+@click.option("--auto-fix", is_flag=True,
+              help="Generate automatic fixes for common issues")
+@click.option("--vcs-analysis", is_flag=True,
+              help="Analyze VCS history for hotspots and trends")
+@click.option("--track-trends", is_flag=True,
+              help="Store analysis in trends database")
+@click.option("--generate-cicd", type=click.Choice(["github", "gitlab", "all"]),
+              help="Generate CI/CD configuration files")
+def analyze(project_path, depth, logseq_graph, create_tickets, generate_docs, output, config, plugins, code_library, use_default_library, onboarding, auto_fix, vcs_analysis, track_trends, generate_cicd):
     """Analyze a Python project."""
     console.print("[bold blue]🔍 Code Analyzer[/bold blue]")
     console.print(f"Project: {project_path}\n")
@@ -102,6 +114,16 @@ def analyze(project_path, depth, logseq_graph, create_tickets, generate_docs, ou
     with console.status("[bold green]Analyzing code..."):
         result = analyzer.analyze(depth=depth)
     
+    # VCS Analysis
+    vcs_insights = None
+    if vcs_analysis:
+        console.print("\n📊 Analyzing VCS history...")
+        vcs_analyzer = VCSAnalyzer(Path(project_path))
+        vcs_insights = vcs_analyzer.analyze(since_days=90)
+        if vcs_insights:
+            console.print(f"   ✅ Analyzed {vcs_insights.total_commits} commits")
+            console.print(f"   ✅ Found {len(vcs_insights.hotspots)} maintenance hotspots")
+    
     # Display summary
     _display_summary(result)
     
@@ -114,6 +136,21 @@ def analyze(project_path, depth, logseq_graph, create_tickets, generate_docs, ou
         project_name = Path(project_path).name
         doc_gen = LogseqDocGenerator(logseq_graph)
         doc_gen.generate_documentation(result, project_name)
+    
+    # Track trends
+    if track_trends:
+        trends_db = TrendsDatabase(output_dir / "trends.db")
+        branch = vcs_insights.branch_name if vcs_insights else ""
+        trends_db.store_analysis(result, branch=branch)
+        console.print("\n📈 Stored analysis in trends database")
+        
+        # Generate trend report
+        trends = trends_db.get_trends(str(Path(project_path).resolve()), days=30)
+        if len(trends) >= 2:
+            trend_report = generate_trend_markdown(trends, Path(project_path).name)
+            trend_file = output_dir / "TRENDS.md"
+            trend_file.write_text(trend_report)
+            console.print(f"   ✅ Generated trend report: {trend_file}")
     
     # Save JSON report AFTER documentation (so resolved issue tracking works)
     json_file = output_dir / "analysis.json"
@@ -142,6 +179,47 @@ def analyze(project_path, depth, logseq_graph, create_tickets, generate_docs, ou
         # Also print it to console
         console.print("\n" + "=" * 80)
         console.print(onboarding_report)
+    
+    # Generate auto-fixes
+    if auto_fix:
+        console.print("\n🔧 Generating automatic fixes...")
+        fixer = AutoFixGenerator()
+        fixes = fixer.generate_fixes(result.issues, Path(project_path))
+        
+        if fixes:
+            console.print(f"   🔍 Found {len(fixes)} auto-fixable issues\n")
+            
+            # Preview fixes
+            for i, fix in enumerate(fixes[:5], 1):  # Show first 5
+                console.print(f"   {i}. [{fix.confidence.upper()}] {fix.description}")
+                console.print(f"      File: {fix.file_path}")
+            
+            if len(fixes) > 5:
+                console.print(f"   ... and {len(fixes) - 5} more\n")
+            
+            # Save fixes
+            fixes_file = output_dir / "FIXES.md"
+            with open(fixes_file, 'w') as f:
+                f.write("# Automatic Fixes\n\n")
+                for fix in fixes:
+                    f.write(f"## {fix.description}\n")
+                    f.write(f"**File**: `{fix.file_path}`\n")
+                    f.write(f"**Confidence**: {fix.confidence}\n\n")
+                    f.write("```diff\n")
+                    f.write(fix.generate_diff())
+                    f.write("\n```\n\n")
+            
+            console.print(f"   💾 Saved fixes to: {fixes_file}")
+            console.print(f"   💡 Review fixes and apply manually or run with --apply-fixes flag (future)")
+        else:
+            console.print("   ✅ No auto-fixable issues found")
+    
+    # Generate CI/CD configs
+    if generate_cicd:
+        console.print(f"\n⚙️  Generating {generate_cicd.upper()} CI/CD configurations...")
+        cicd_files = generate_all_cicd(Path(project_path), generate_cicd)
+        for file in cicd_files:
+            console.print(f"   ✅ Created: {file}")
     
     console.print("\n[bold green]✅ Analysis complete![/bold green]")
 
