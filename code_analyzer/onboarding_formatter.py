@@ -6,6 +6,7 @@ from .onboarding import OnboardingInsights, CodeSnapshot
 from .call_graph import CallGraphBuilder
 from .why_docs import WhyDocsExtractor, format_why_section
 from .interactive_examples import InteractiveExamplesGenerator, format_example
+from .workflows import WorkflowsGenerator, format_workflow
 
 
 def generate_editor_links(file_path: str, line: int, project_root: str = None) -> dict:
@@ -405,6 +406,39 @@ def format_interactive_examples(insights: OnboardingInsights, project_name: str 
     return "\n".join(output)
 
 
+def format_common_workflows(insights: OnboardingInsights, modules: list = None) -> str:
+    """Format common developer workflows section."""
+    output = []
+    
+    output.append("# 🔧 COMMON WORKFLOWS")
+    output.append("=" * 80)
+    output.append("")
+    output.append("Step-by-step guides for common developer tasks.")
+    output.append("")
+    
+    if not modules:
+        output.append("_No workflows available_")
+        return "\n".join(output)
+    
+    try:
+        generator = WorkflowsGenerator(insights.overview.name, modules)
+        workflows = generator.generate_workflows()
+        
+        if not workflows:
+            output.append("_No workflows could be generated_")
+            return "\n".join(output)
+        
+        for workflow in workflows:
+            workflow_lines = format_workflow(workflow)
+            output.extend(workflow_lines)
+        
+    except Exception as e:
+        output.append(f"_Could not generate workflows: {str(e)}_")
+        output.append("")
+    
+    return "\n".join(output)
+
+
 def format_debugging_guide(insights: OnboardingInsights) -> str:
     """Format debugging and troubleshooting guide."""
     output = []
@@ -503,6 +537,11 @@ def format_enhanced_onboarding(insights: OnboardingInsights, project_root: str =
     # Interactive examples
     if modules:
         sections.append(format_interactive_examples(insights, insights.overview.name, modules))
+        sections.append("")
+    
+    # Common workflows
+    if modules:
+        sections.append(format_common_workflows(insights, modules))
         sections.append("")
     
     # Debugging guide
