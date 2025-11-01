@@ -5,6 +5,7 @@ from typing import List
 from .onboarding import OnboardingInsights, CodeSnapshot
 from .call_graph import CallGraphBuilder
 from .why_docs import WhyDocsExtractor, format_why_section
+from .interactive_examples import InteractiveExamplesGenerator, format_example
 
 
 def generate_editor_links(file_path: str, line: int, project_root: str = None) -> dict:
@@ -371,6 +372,39 @@ def format_why_documentation(insights: OnboardingInsights, project_root: str = N
     return "\n".join(output)
 
 
+def format_interactive_examples(insights: OnboardingInsights, project_name: str = None, modules: list = None) -> str:
+    """Format interactive code examples section."""
+    output = []
+    
+    output.append("# 🎨 INTERACTIVE EXAMPLES")
+    output.append("=" * 80)
+    output.append("")
+    output.append("Copy-paste these examples to quickly understand how components work.")
+    output.append("")
+    
+    if not modules or not project_name:
+        output.append("_No examples available_")
+        return "\n".join(output)
+    
+    try:
+        generator = InteractiveExamplesGenerator(project_name, modules)
+        examples = generator.generate_examples()
+        
+        if not examples:
+            output.append("_No runnable examples could be generated_")
+            return "\n".join(output)
+        
+        for example in examples:
+            example_lines = format_example(example)
+            output.extend(example_lines)
+        
+    except Exception as e:
+        output.append(f"_Could not generate examples: {str(e)}_")
+        output.append("")
+    
+    return "\n".join(output)
+
+
 def format_debugging_guide(insights: OnboardingInsights) -> str:
     """Format debugging and troubleshooting guide."""
     output = []
@@ -464,6 +498,11 @@ def format_enhanced_onboarding(insights: OnboardingInsights, project_root: str =
     # Why this exists (git history)
     if project_root:
         sections.append(format_why_documentation(insights, project_root))
+        sections.append("")
+    
+    # Interactive examples
+    if modules:
+        sections.append(format_interactive_examples(insights, insights.overview.name, modules))
         sections.append("")
     
     # Debugging guide
