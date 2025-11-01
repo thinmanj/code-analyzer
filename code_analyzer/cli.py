@@ -12,6 +12,7 @@ from .anonymizer import CodeAnonymizer
 from .logseq_integration import LogseqDocGenerator
 from .tickets_integration import TicketsManager
 from .models import IssueSeverity
+from .onboarding import OnboardingAnalyzer, format_onboarding_report
 
 console = Console()
 
@@ -43,7 +44,9 @@ def main():
               help="Path to code library YAML file")
 @click.option("--use-default-library", is_flag=True,
               help="Use built-in default code library")
-def analyze(project_path, depth, logseq_graph, create_tickets, generate_docs, output, config, plugins, code_library, use_default_library):
+@click.option("--onboarding", is_flag=True,
+              help="Generate onboarding guide for new developers")
+def analyze(project_path, depth, logseq_graph, create_tickets, generate_docs, output, config, plugins, code_library, use_default_library, onboarding):
     """Analyze a Python project."""
     console.print("[bold blue]🔍 Code Analyzer[/bold blue]")
     console.print(f"Project: {project_path}\n")
@@ -123,6 +126,22 @@ def analyze(project_path, depth, logseq_graph, create_tickets, generate_docs, ou
         project_name = Path(project_path).name
         tickets_mgr = TicketsManager(project_path)
         tickets_mgr.create_epic_and_tickets(result, project_name)
+    
+    # Generate onboarding report
+    if onboarding:
+        onboarding_analyzer = OnboardingAnalyzer(Path(project_path))
+        insights = onboarding_analyzer.generate_insights(result.modules)
+        onboarding_report = format_onboarding_report(insights)
+        
+        # Save onboarding report
+        onboarding_file = output_dir / "ONBOARDING.md"
+        with open(onboarding_file, 'w') as f:
+            f.write(onboarding_report)
+        console.print(f"\n📚 Saved onboarding guide to: {onboarding_file}")
+        
+        # Also print it to console
+        console.print("\n" + "=" * 80)
+        console.print(onboarding_report)
     
     console.print("\n[bold green]✅ Analysis complete![/bold green]")
 

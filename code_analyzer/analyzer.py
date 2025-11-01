@@ -7,6 +7,7 @@ from typing import List, Dict, Set, Optional
 from datetime import datetime
 from radon.complexity import cc_visit
 from radon.metrics import mi_visit
+from tqdm import tqdm
 
 from .models import (
     AnalysisResult, ModuleInfo, FunctionInfo, ClassInfo, CodeLocation,
@@ -73,14 +74,14 @@ class CodeAnalyzer:
         # Run pre-analysis hooks
         self.plugin_manager.run_pre_analysis_hooks([])
         
-        # Analyze each file
-        for file_path in python_files:
+        # Analyze each file with progress bar
+        for file_path in tqdm(python_files, desc="📄 Analyzing files", unit="file"):
             try:
                 module_info = self._analyze_file(file_path)
                 if module_info:
                     self.modules.append(module_info)
             except Exception as e:
-                print(f"   ⚠️  Error analyzing {file_path}: {e}")
+                tqdm.write(f"   ⚠️  Error analyzing {file_path}: {e}")
         
         # Build call graph
         self._build_call_graph()
@@ -124,15 +125,15 @@ class CodeAnalyzer:
         # Run pattern matching against code library
         library_matches = []
         if self.pattern_matcher:
-            print(f"📚 Running pattern matching against code library")
-            for module in self.modules:
+            for module in tqdm(self.modules, desc="📚 Pattern matching", unit="module"):
                 matches = self.pattern_matcher.find_matches(module)
                 library_matches.extend(matches)
             
             # Generate issues from bad/smelly patterns
             library_issues = self.pattern_matcher.generate_issues_from_matches(library_matches)
             self.issues.extend(library_issues)
-            print(f"   Found {len(library_matches)} pattern matches ({len(library_issues)} issues)")
+            if library_matches:
+                print(f"   Found {len(library_matches)} pattern matches ({len(library_issues)} issues)")
         
         # Run post-analysis hooks
         self.plugin_manager.run_post_analysis_hooks(self.modules, self.issues)

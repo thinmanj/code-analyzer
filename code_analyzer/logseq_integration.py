@@ -73,6 +73,9 @@ class LogseqDocGenerator:
         # Create top findings page (summary)
         self._create_top_findings_page(result, project_name)
         
+        # Create journal entry for tracking
+        self._create_journal_entry(result, project_name)
+        
         print(f"✅ Documentation generated in {self.graph_path}")
     
     def _create_project_overview(self, result: AnalysisResult, project_name: str):
@@ -513,3 +516,55 @@ Code sections that need updates, refactoring, or enhancements.
         
         file_path.write_text(content)
         print(f"   📝 Wrote markdown: {file_path}")
+    
+    def _create_journal_entry(self, result: AnalysisResult, project_name: str):
+        """Create a journal entry for tracking issues over time."""
+        # Get today's date
+        today = datetime.now()
+        journal_date = today.strftime('%Y_%m_%d')
+        
+        # Create journal directory if it doesn't exist
+        journals_dir = self.graph_path / "journals"
+        journals_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Create journal file path
+        journal_file = journals_dir / f"{journal_date}.md"
+        
+        # Create journal content
+        content = f"""- ## 🔍 Code Analysis: [[{project_name}]]
+  - **Time**: {today.strftime('%H:%M')}
+  - **Status**: #code-analysis/identified
+  - **Issues Found**: {result.metrics.total_issues}
+  - **Critical**: {result.metrics.issues_by_severity.get('critical', 0)} | **High**: {result.metrics.issues_by_severity.get('high', 0)} | **Medium**: {result.metrics.issues_by_severity.get('medium', 0)} | **Low**: {result.metrics.issues_by_severity.get('low', 0)}
+  - 
+  - ### 🎯 Top Issues to Address:
+"""
+        
+        # Add top 5 high/critical issues
+        high_issues = [i for i in result.issues if i.severity.value in ['critical', 'high']]
+        for i, issue in enumerate(high_issues[:5], 1):
+            severity_emoji = '🔴' if issue.severity.value == 'critical' else '🟠'
+            content += f"  - {severity_emoji} **{issue.title}** at `{issue.location}` #issue/open\n"
+            content += f"    - TODO Mark as #issue/resolved when fixed\n"
+        
+        if not high_issues:
+            content += "  - ✅ No high/critical issues found!\n"
+        
+        # Add summary of improvement opportunities
+        if result.improvements:
+            content += f"  - \n  - ### 💡 Quick Wins ({len([i for i in result.improvements if i.effort == 'small' and i.impact == 'high'])} available):\n"
+            quick_wins = [i for i in result.improvements if i.effort == 'small' and i.impact == 'high']
+            for qw in quick_wins[:3]:
+                content += f"  - [ ] {qw.issue} at `{qw.location}` #improvement\n"
+        
+        # Add link to full analysis
+        content += f"  - \n  - 📊 **Full Analysis**: [[{project_name}/Top Findings]]\n"
+        content += f"  - \n  - ---\n"
+        
+        # Append to existing journal or create new
+        if journal_file.exists():
+            existing_content = journal_file.read_text()
+            content = existing_content + "\n" + content
+        
+        journal_file.write_text(content)
+        print(f"   ✅ Created journal entry: {journal_file.name}")

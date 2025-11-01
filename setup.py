@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="code-analyzer",
-    version="0.1.0",
+    version="0.2.1",
     author="Julio",
     description="Deep source code analysis and documentation tool",
     long_description=long_description,
@@ -29,6 +29,7 @@ setup(
         "pyyaml>=6.0",
         "radon>=6.0.0",
         "rich>=13.0.0",
+        "tqdm>=4.65.0",
     ],
     extras_require={
         "full": [
