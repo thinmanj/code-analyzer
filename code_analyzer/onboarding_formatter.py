@@ -3,6 +3,7 @@
 from pathlib import Path
 from typing import List
 from .onboarding import OnboardingInsights, CodeSnapshot
+from .call_graph import CallGraphBuilder
 
 
 def generate_editor_links(file_path: str, line: int, project_root: str = None) -> dict:
