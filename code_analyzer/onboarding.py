@@ -258,6 +258,47 @@ class OnboardingAnalyzer:
         else:
             return "Supporting module"
     
+    def _extract_code_snapshot(self, module: ModuleInfo, cls: ClassInfo = None, func: FunctionInfo = None) -> Optional[CodeSnapshot]:
+        """Extract code snapshot with context."""
+        try:
+            file_path = self.project_path / module.file_path
+            if not file_path.exists():
+                return None
+            
+            source = file_path.read_text()
+            lines = source.splitlines()
+            
+            if cls:
+                # Extract class definition (up to 20 lines)
+                start = cls.location.line_start - 1
+                end = min(start + 20, len(lines), cls.location.line_end)
+                code = '\n'.join(lines[start:end])
+                context = cls.docstring.split('\n')[0] if cls.docstring else f"Class with {len(cls.methods)} methods"
+                entity_name = cls.name
+                entity_type = "class"
+            elif func:
+                # Extract function definition (up to 15 lines)
+                start = func.location.line_start - 1
+                end = min(start + 15, len(lines), func.location.line_end)
+                code = '\n'.join(lines[start:end])
+                context = func.docstring.split('\n')[0] if func.docstring else "Function"
+                entity_name = func.name
+                entity_type = "function"
+            else:
+                return None
+            
+            return CodeSnapshot(
+                file_path=module.file_path,
+                line_start=start + 1,
+                line_end=end,
+                code=code,
+                context=context,
+                entity_type=entity_type,
+                entity_name=entity_name
+            )
+        except Exception:
+            return None
+    
     def _identify_key_concepts(self, modules: List[ModuleInfo]) -> KeyConcepts:
         """Identify important concepts and patterns."""
         main_classes = []
@@ -265,7 +306,7 @@ class OnboardingAnalyzer:
         design_patterns = []
         data_flow = []
         
-        # Find main classes (large or important ones)
+        # Find main classes (large or important ones) with code snapshots
         for module in modules:
             for cls in module.classes:
                 # Skip test classes
@@ -275,14 +316,18 @@ class OnboardingAnalyzer:
                 # Important if it has many methods or is in a core module
                 if len(cls.methods) > 5:
                     purpose = cls.docstring.split('\n')[0] if cls.docstring else f"{len(cls.methods)} methods"
-                    main_classes.append((f"{module.name}.{cls.name}", purpose))
+                    snapshot = self._extract_code_snapshot(module, cls=cls)
+                    if snapshot:
+                        main_classes.append((f"{module.name}.{cls.name}", purpose, snapshot))
         
-        # Find core functions (called often or complex)
+        # Find core functions (called often or complex) with code snapshots
         for module in modules:
             for func in module.functions:
                 if func.complexity > 8 or len(func.called_by) > 3:
                     role = func.docstring.split('\n')[0] if func.docstring else "Core function"
-                    core_functions.append((f"{module.name}.{func.name}", role))
+                    snapshot = self._extract_code_snapshot(module, func=func)
+                    if snapshot:
+                        core_functions.append((f"{module.name}.{func.name}", role, snapshot))
         
         # Detect design patterns
         class_names = []

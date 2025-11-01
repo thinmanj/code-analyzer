@@ -1,11 +1,11 @@
 {
   "project_path": "/Volumes/Projects/code-analyzer",
-  "analysis_date": "2025-10-31T23:44:01.704286",
+  "analysis_date": "2025-11-01T07:54:48.910471",
   "metrics": {
     "total_files": 27,
-    "total_lines": 8592,
+    "total_lines": 8637,
     "total_classes": 87,
-    "total_functions": 332,
+    "total_functions": 333,
     "total_issues": 17,
     "issues_by_severity": {
       "medium": 10,
@@ -18,7 +18,7 @@
       "code_smell": 2,
       "conceptual": 1
     },
-    "average_complexity": 2.88855421686747,
+    "average_complexity": 2.900900900900901,
     "max_complexity": 27
   },
   "issues": [
@@ -92,13 +92,13 @@
       "severity": "high",
       "title": "High complexity in format_onboarding_report",
       "description": "Function has cyclomatic complexity of 16",
-      "location": "code_analyzer/onboarding.py:447-530 in format_onboarding_report()",
+      "location": "code_analyzer/onboarding.py:492-575 in format_onboarding_report()",
       "recommendation": "Consider breaking this function into smaller, more focused functions",
       "code_snippet": null,
       "metadata": {
         "complexity": 16
       },
-      "fingerprint": "e1b11b43a0c4edca"
+      "fingerprint": "79398d8d15f3841e"
     },
     {
       "type": "complexity",
@@ -143,14 +143,14 @@
       "type": "complexity",
       "severity": "high",
       "title": "High complexity in _identify_key_concepts",
-      "description": "Function has cyclomatic complexity of 21",
-      "location": "code_analyzer/onboarding.py:261-339 in _identify_key_concepts() [OnboardingAnalyzer]",
+      "description": "Function has cyclomatic complexity of 23",
+      "location": "code_analyzer/onboarding.py:302-384 in _identify_key_concepts() [OnboardingAnalyzer]",
       "recommendation": "Consider breaking this function into smaller, more focused functions",
       "code_snippet": null,
       "metadata": {
-        "complexity": 21
+        "complexity": 23
       },
-      "fingerprint": "7861f55a391e924f"
+      "fingerprint": "a8ae5e9ce6f3f261"
     },
     {
       "type": "complexity",
@@ -273,7 +273,7 @@
     },
     {
       "name": "code_analyzer.onboarding.format_onboarding_report",
-      "location": "code_analyzer/onboarding.py:447-530 in format_onboarding_report()",
+      "location": "code_analyzer/onboarding.py:492-575 in format_onboarding_report()",
       "reason": "High complexity (16)",
       "risk_level": "high"
     },
