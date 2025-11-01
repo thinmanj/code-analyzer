@@ -92,6 +92,7 @@ class FunctionInfo:
     is_generator: bool = False
     calls: List[str] = field(default_factory=list)
     called_by: List[str] = field(default_factory=list)
+    decorators: List[str] = field(default_factory=list)
     source_code: Optional[str] = None
     lines_of_code: Optional[int] = None
 

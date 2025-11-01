@@ -349,6 +349,13 @@ class CodeAnalyzer:
                 if call_name:
                     calls.append(call_name)
         
+        # Extract decorators
+        decorators = []
+        for decorator in node.decorator_list:
+            decorator_name = self._get_name(decorator)
+            if decorator_name:
+                decorators.append(decorator_name)
+        
         is_async = isinstance(node, ast.AsyncFunctionDef)
         is_generator = any(isinstance(n, ast.Yield) for n in ast.walk(node))
         
@@ -361,7 +368,8 @@ class CodeAnalyzer:
             complexity=complexity,
             is_async=is_async,
             is_generator=is_generator,
-            calls=calls
+            calls=calls,
+            decorators=decorators
         )
     
     def _get_name(self, node: ast.AST) -> str:
@@ -466,6 +474,53 @@ class CodeAnalyzer:
                         metadata={"complexity": func.complexity}
                     ))
     
+    def _has_framework_decorators(self, func: FunctionInfo) -> bool:
+        """Check if function has decorators that indicate external usage."""
+        framework_decorators = [
+            # Click (CLI framework)
+            'click.command', 'click.group', 'command', 'group',
+            # Pytest (testing framework)
+            'pytest.fixture', 'fixture',
+            # Flask/FastAPI (web frameworks)
+            'app.route', 'route', 'get', 'post', 'put', 'delete',
+            'app.get', 'app.post', 'app.put', 'app.delete',
+            # Django
+            'require_http_methods', 'login_required',
+            # Celery (task queue)
+            'task', 'shared_task',
+            # Property decorators
+            'property', 'staticmethod', 'classmethod',
+        ]
+        
+        for decorator in func.decorators:
+            # Check for exact match or if it's a method call (e.g., app.route())
+            decorator_lower = decorator.lower()
+            for framework_dec in framework_decorators:
+                if framework_dec in decorator_lower:
+                    return True
+        
+        return False
+    
+    def _is_public_api(self, func: FunctionInfo, module: ModuleInfo) -> bool:
+        """Check if function appears to be part of public API."""
+        # Functions in __init__.py are likely public API
+        if '__init__' in module.file_path:
+            return True
+        
+        # Functions starting with underscore are private
+        if func.name.startswith('_'):
+            return False
+        
+        # If module has __all__, check if function is in it
+        # (We'd need to parse __all__ from the AST, but this is a simple heuristic)
+        # For now, assume non-private functions in certain directories are public
+        public_dirs = ['api', 'public', 'interface', 'facade']
+        for dir_name in public_dirs:
+            if dir_name in module.file_path:
+                return True
+        
+        return False
+    
     def _detect_unused_code(self):
         """Detect potentially unused code."""
         # Find functions that are never called
@@ -485,10 +540,22 @@ class CodeAnalyzer:
             if func_name.endswith(('__init__', '__main__', 'main', '__str__', '__repr__')):
                 continue
             
-            # Find the function to get its location
+            # Find the function to get its location and decorators
             for module in self.modules:
                 for func in module.functions:
                     if f"{module.name}.{func.name}" == func_name:
+                        # Skip if it has framework decorators that make it used externally
+                        if self._has_framework_decorators(func):
+                            continue
+                        
+                        # Skip if it's in __init__.py (likely part of public API)
+                        if module.file_path.endswith('__init__.py'):
+                            continue
+                        
+                        # Skip if function name suggests it's a public API
+                        if self._is_public_api(func, module):
+                            continue
+                        
                         self.issues.append(Issue(
                             issue_type=IssueType.UNUSED_CODE,
                             severity=IssueSeverity.LOW,
