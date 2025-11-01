@@ -15,9 +15,11 @@ Code Analyzer is a comprehensive tool that reads source code, understands its st
 - 🔧 **Auto-Fix Generation**: Automatic fixes for common issues with confidence levels
 - 🎫 **CI/CD Integration**: Generate GitHub Actions and GitLab CI workflows
 
-### 🎉 **NEW in v0.5.0: World-Class Engineering Onboarding**
+### 🎉 World-Class Engineering Onboarding (v0.5.0-v0.6.0)
 
 **Transform onboarding from days to hours** with comprehensive, actionable documentation:
+
+#### Phase 1: Core Onboarding (v0.5.0)
 
 1. **📝 Real Code Snippets** - Extract 10-20 line examples from key components
    - Multi-editor deep links (VS Code, IntelliJ, Neovim, Vim, Emacs, Sublime, Atom)
@@ -48,7 +50,70 @@ Code Analyzer is a comprehensive tool that reads source code, understands its st
    - Code examples with file locations
    - Pro tips and prerequisites for each workflow
 
+#### Phase 2: Advanced Understanding (v0.6.0)
+
+6. **🏛️ Architecture Diagrams** - 5 visualization types
+   - Layered architecture (presentation/application/domain/infrastructure)
+   - Component interaction maps
+   - Package structure with dependencies
+   - Dependency graph with coupling analysis
+   - Complexity heatmap by module
+
+7. **🔧 Troubleshooting Playbook** - Issue-driven solutions
+   - Categorized by pattern (complexity/unused/imports/errors/security)
+   - Targeted solutions with code examples
+   - Common causes and symptoms
+   - General troubleshooting guidance
+
+8. **📖 Glossary & Key Concepts** - Auto-generated terminology
+   - Technical terms from imports and patterns
+   - Domain concepts from class/function names
+   - Definitions mined from docstrings
+   - Alphabetically organized
+
+9. **⚠️ Edge Cases Documentation** - Boundary conditions
+   - Detected edge case handling
+   - Validation recommendations
+   - General guidelines for safety
+
 **Result**: Engineers onboard in **<4 hours instead of days**! ✨
+**Output**: 2,151 lines of comprehensive onboarding (v0.6.0)
+
+### 🧠 Intelligence & Metrics (v0.7.0)
+
+**NEW**: Comprehensive intelligence reports for technical leadership and team health:
+
+10. **📈 Quality Trends** - Historical metrics analysis
+    - Insights by category (improvement/warning/regression/stable)
+    - Velocity analysis (accelerating/degrading)
+    - ASCII trend charts
+    - Issue density tracking
+
+11. **💳 Technical Debt** - Quantified debt tracking
+    - Scoring by category (complexity/docs/design/duplication)
+    - Effort estimates in hours/days/weeks
+    - Quick wins identification (<2 hours)
+    - Remediation strategy roadmap
+
+12. **⚡ Performance Hotspots** - Static pattern detection
+    - Nested loops and high complexity
+    - Inefficient search patterns
+    - Deep recursion warnings
+    - Optimization suggestions
+
+13. **🔒 Security & Dependencies** - Vulnerability scanning
+    - Known CVE checking
+    - Outdated package detection
+    - Security best practices
+    - Upgrade recommendations
+
+14. **🧪 Test Coverage** - Multi-format analysis
+    - Parse coverage.xml, .coverage, htmlcov
+    - Critical gap identification
+    - Module-by-module breakdown
+    - Coverage recommendations
+
+**Usage**: `--intelligence --track-trends` generates INTELLIGENCE.md (238-287 lines)
 
 ### Integration & Extensibility
 - 🔌 **Plugin System**: Extensible architecture for custom analyzers and rules
@@ -69,13 +134,17 @@ pip install -e .
 ## Quick Start
 
 ```bash
-# Generate world-class onboarding documentation (NEW in v0.5.0!)
+# Generate world-class onboarding documentation
 code-analyzer analyze /path/to/project --onboarding --output ./analysis
+
+# Generate intelligence reports (trends, debt, performance, security, coverage)
+code-analyzer analyze /path/to/project --intelligence --track-trends --output ./analysis
 
 # Full analysis with all features
 code-analyzer analyze /path/to/project \
   --depth deep \
   --onboarding \
+  --intelligence \
   --auto-fix \
   --vcs-analysis \
   --track-trends \
@@ -100,15 +169,27 @@ code-analyzer anonymize /path/to/project --output /tmp/anonymized
 
 Running onboarding on real projects generates comprehensive documentation:
 
+### Onboarding Output (v0.6.0)
+
 | Project | Files | Lines | Onboarding Lines | Features |
 |---------|-------|-------|-----------------|----------|
-| code-analyzer | 31 | 10,147 | 869 | ✅ All 5 |
-| python-optimizer | 71 | 23,894 | 1,153 | ✅ All 5 |
-| agentscript | 58 | ~15K | 1,099 | ✅ All 5 |
-| OrbisTertius | 53 | ~18K | 1,185 | ✅ All 5 |
-| logseq-python | 75 | ~25K | 1,274 | ✅ All 5 |
+| code-analyzer | 41 | 12,845 | 2,151 | ✅ All 9 |
+| python-optimizer | 71 | 23,894 | ~2,000 | ✅ All 9 |
+| agentscript | 58 | ~15K | ~1,900 | ✅ All 9 |
+| logseq-python | 75 | ~25K | ~2,100 | ✅ All 9 |
 
-**Each includes**: Real code snippets, call graphs, git history, interactive examples, and step-by-step workflows.
+**Each includes**: Real code snippets, call graphs, git history, interactive examples, workflows, architecture diagrams, troubleshooting playbook, glossary, and edge cases.
+
+### Intelligence Output (v0.7.0)
+
+| Project | Files | Intelligence Lines | Reports |
+|---------|-------|--------------------|----------|
+| code-analyzer | 41 | 281 | ✅ All 5 |
+| agentscript | 58 | 238 | ✅ All 5 |
+| python-optimizer | 71 | 271 | ✅ All 5 |
+| logseq-python | 75 | 287 | ✅ All 5 |
+
+**Each includes**: Quality trends, technical debt, performance hotspots, security scan, and test coverage analysis.
 
 ## Configuration
 
