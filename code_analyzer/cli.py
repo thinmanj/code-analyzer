@@ -456,5 +456,109 @@ def _result_to_dict(result):
     }
 
 
+@main.command()
+@click.argument("project_path", type=click.Path(exists=True))
+@click.argument("query", type=str)
+@click.option("--limit", default=10, help="Maximum number of results")
+def search(project_path, query, limit):
+    """Search codebase with natural language query.
+    
+    Examples:
+      code-analyzer search . "functions that handle HTTP requests"
+      code-analyzer search /path/to/project "database connection classes"
+    """
+    from .nl_search import NaturalLanguageSearch, format_search_results
+    
+    console.print(f"[bold blue]🔍 Searching:[/bold blue] {query}\n")
+    
+    # Run analysis first
+    analyzer = CodeAnalyzer(project_path)
+    with console.status("[bold green]Analyzing code..."):
+        result = analyzer.analyze(depth="shallow")
+    
+    # Search
+    searcher = NaturalLanguageSearch(result.modules)
+    results = searcher.search(query, limit=limit)
+    
+    # Display results
+    if results:
+        console.print(f"\n[bold green]Found {len(results)} results:[/bold green]\n")
+        output = format_search_results(results)
+        console.print(output)
+    else:
+        console.print("[yellow]No results found. Try different keywords.[/yellow]")
+
+
+@main.command()
+@click.argument("project_path", type=click.Path(exists=True))
+@click.option("--provider", type=click.Choice(["openai", "anthropic"]), default="openai",
+              help="LLM provider")
+@click.option("--question", type=str, help="Question to ask about codebase")
+@click.option("--explain-module", type=str, help="Module name to explain")
+@click.option("--generate-docs", is_flag=True, help="Generate project documentation")
+def llm(project_path, provider, question, explain_module, generate_docs):
+    """Use LLM to analyze and explain code.
+    
+    Examples:
+      code-analyzer llm . --question "What does the auth module do?"
+      code-analyzer llm . --explain-module api_handler
+      code-analyzer llm . --generate-docs
+    """
+    from .llm_analyzer import LLMAnalyzer, format_llm_response
+    
+    try:
+        llm_analyzer = LLMAnalyzer(provider=provider)
+    except ValueError as e:
+        console.print(f"[red]Error: {e}[/red]")
+        console.print(f"\nSet {provider.upper()}_API_KEY environment variable or add to .code-analyzer.yaml")
+        return
+    except ImportError as e:
+        console.print(f"[red]Error: {e}[/red]")
+        return
+    
+    # Run analysis
+    console.print(f"[bold blue]🤖 LLM Analysis ({provider})[/bold blue]\n")
+    analyzer = CodeAnalyzer(project_path)
+    with console.status("[bold green]Analyzing code..."):
+        result = analyzer.analyze(depth="shallow")
+    
+    # Process request
+    if question:
+        # Build context
+        context = f"""Project: {Path(project_path).name}
+Modules: {len(result.modules)}
+Key modules: {', '.join(m.name for m in result.modules[:20])}"""
+        
+        console.print(f"[bold]Question:[/bold] {question}\n")
+        response = llm_analyzer.answer_question(question, context)
+        console.print(format_llm_response(response))
+    
+    elif explain_module:
+        # Find module
+        module = next((m for m in result.modules if m.name == explain_module), None)
+        if not module:
+            console.print(f"[red]Module '{explain_module}' not found[/red]")
+            return
+        
+        console.print(f"[bold]Explaining module:[/bold] {explain_module}\n")
+        response = llm_analyzer.summarize_module(module)
+        console.print(format_llm_response(response))
+    
+    elif generate_docs:
+        console.print(f"[bold]Generating documentation...[/bold]\n")
+        response = llm_analyzer.generate_documentation(result.modules, Path(project_path).name)
+        
+        # Save to file
+        output_file = Path(project_path) / ".code-analyzer" / "LLM_DOCS.md"
+        output_file.parent.mkdir(exist_ok=True)
+        output_file.write_text(response.response)
+        
+        console.print(format_llm_response(response))
+        console.print(f"\n💾 Saved to: {output_file}")
+    
+    else:
+        console.print("[yellow]Specify --question, --explain-module, or --generate-docs[/yellow]")
+
+
 if __name__ == "__main__":
     main()
