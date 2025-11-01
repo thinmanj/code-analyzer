@@ -1,9 +1,10 @@
 """Data models for code analysis results."""
 
 from dataclasses import dataclass, field
-from enum import Enum
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Optional, Any
 from datetime import datetime
+from enum import Enum
+import hashlib
 
 
 class IssueType(Enum):
@@ -65,6 +66,12 @@ class Issue:
     related_locations: List[CodeLocation] = field(default_factory=list)
     metadata: Dict[str, Any] = field(default_factory=dict)
     
+    def fingerprint(self) -> str:
+        """Generate unique fingerprint for issue tracking."""
+        # Use location and title to generate stable fingerprint
+        key = f"{self.location.file_path}:{self.location.line_start}:{self.title}"
+        return hashlib.sha256(key.encode()).hexdigest()[:16]
+    
     def to_dict(self) -> Dict[str, Any]:
         """Convert issue to dictionary."""
         return {
@@ -76,6 +83,7 @@ class Issue:
             "recommendation": self.recommendation,
             "code_snippet": self.code_snippet,
             "metadata": self.metadata,
+            "fingerprint": self.fingerprint(),
         }
 
 

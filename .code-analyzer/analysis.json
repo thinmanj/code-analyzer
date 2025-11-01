@@ -1,11 +1,11 @@
 {
   "project_path": "/Volumes/Projects/code-analyzer",
-  "analysis_date": "2025-10-31T22:37:12.754383",
+  "analysis_date": "2025-10-31T22:54:50.106963",
   "metrics": {
     "total_files": 22,
-    "total_lines": 6892,
+    "total_lines": 6934,
     "total_classes": 76,
-    "total_functions": 283,
+    "total_functions": 286,
     "total_issues": 15,
     "issues_by_severity": {
       "medium": 9,
@@ -18,7 +18,7 @@
       "code_smell": 2,
       "conceptual": 1
     },
-    "average_complexity": 2.7102473498233217,
+    "average_complexity": 2.702797202797203,
     "max_complexity": 21
   },
   "issues": [
@@ -32,7 +32,8 @@
       "code_snippet": null,
       "metadata": {
         "complexity": 11
-      }
+      },
+      "fingerprint": "9cd5742da8f59bbd"
     },
     {
       "type": "complexity",
@@ -44,7 +45,8 @@
       "code_snippet": null,
       "metadata": {
         "complexity": 15
-      }
+      },
+      "fingerprint": "cc1ef2302c2fe12c"
     },
     {
       "type": "complexity",
@@ -56,7 +58,8 @@
       "code_snippet": null,
       "metadata": {
         "complexity": 12
-      }
+      },
+      "fingerprint": "e5711f687eeae2fb"
     },
     {
       "type": "complexity",
@@ -68,7 +71,8 @@
       "code_snippet": null,
       "metadata": {
         "complexity": 12
-      }
+      },
+      "fingerprint": "7d20a9350f7f764a"
     },
     {
       "type": "complexity",
@@ -80,7 +84,8 @@
       "code_snippet": null,
       "metadata": {
         "complexity": 14
-      }
+      },
+      "fingerprint": "02d132f4dab2c6ca"
     },
     {
       "type": "complexity",
@@ -92,7 +97,8 @@
       "code_snippet": null,
       "metadata": {
         "complexity": 16
-      }
+      },
+      "fingerprint": "21875d949f76f776"
     },
     {
       "type": "complexity",
@@ -104,7 +110,8 @@
       "code_snippet": null,
       "metadata": {
         "complexity": 17
-      }
+      },
+      "fingerprint": "29e09d921aa22d2c"
     },
     {
       "type": "complexity",
@@ -116,7 +123,8 @@
       "code_snippet": null,
       "metadata": {
         "complexity": 14
-      }
+      },
+      "fingerprint": "4a59dceaeb7837fa"
     },
     {
       "type": "complexity",
@@ -128,7 +136,8 @@
       "code_snippet": null,
       "metadata": {
         "complexity": 14
-      }
+      },
+      "fingerprint": "d76c6bfdf11501eb"
     },
     {
       "type": "complexity",
@@ -140,7 +149,8 @@
       "code_snippet": null,
       "metadata": {
         "complexity": 21
-      }
+      },
+      "fingerprint": "fb705376bcac7b0b"
     },
     {
       "type": "unused_code",
@@ -150,7 +160,8 @@
       "location": "code_analyzer/code_library.py:353-449 in create_default_library()",
       "recommendation": "Consider removing if truly unused, or document its external usage",
       "code_snippet": null,
-      "metadata": {}
+      "metadata": {},
+      "fingerprint": "0fc30758ef758a2e"
     },
     {
       "type": "unused_code",
@@ -160,7 +171,8 @@
       "location": "examples/test_plugins.py:130-160 in test_quality_levels()",
       "recommendation": "Consider removing if truly unused, or document its external usage",
       "code_snippet": null,
-      "metadata": {}
+      "metadata": {},
+      "fingerprint": "1c146925e841a107"
     },
     {
       "type": "code_smell",
@@ -170,7 +182,8 @@
       "location": "code_analyzer/cli.py:49-146 in analyze()",
       "recommendation": "Consider using a configuration object or builder pattern",
       "code_snippet": null,
-      "metadata": {}
+      "metadata": {},
+      "fingerprint": "70aa29ea62c2b9e8"
     },
     {
       "type": "code_smell",
@@ -180,7 +193,8 @@
       "location": "code_analyzer/plugins.py:98-120 in add_rule() [CustomRulePlugin]",
       "recommendation": "Consider using a configuration object or builder pattern",
       "code_snippet": null,
-      "metadata": {}
+      "metadata": {},
+      "fingerprint": "10ff25dd78ba656d"
     },
     {
       "type": "conceptual",
@@ -190,7 +204,8 @@
       "location": "code_analyzer/analyzer.py:22-696 [CodeAnalyzer]",
       "recommendation": "Consider splitting into smaller, more focused classes following SRP",
       "code_snippet": null,
-      "metadata": {}
+      "metadata": {},
+      "fingerprint": "cf0482b415090bf4"
     }
   ],
   "critical_sections": [
@@ -226,8 +241,8 @@
     },
     {
       "name": "code_analyzer.logseq_integration.LogseqDocGenerator",
-      "location": "code_analyzer/logseq_integration.py:22-570 [LogseqDocGenerator]",
-      "reason": "Large class (16 methods)",
+      "location": "code_analyzer/logseq_integration.py:23-604 [LogseqDocGenerator]",
+      "reason": "Large class (18 methods)",
       "risk_level": "medium"
     },
     {

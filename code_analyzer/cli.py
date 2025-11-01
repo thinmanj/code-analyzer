@@ -109,17 +109,17 @@ def analyze(project_path, depth, logseq_graph, create_tickets, generate_docs, ou
     output_dir = Path(project_path) / output
     output_dir.mkdir(parents=True, exist_ok=True)
     
-    # Save JSON report
-    json_file = output_dir / "analysis.json"
-    with open(json_file, 'w') as f:
-        json.dump(_result_to_dict(result), f, indent=2, default=str)
-    console.print(f"\n💾 Saved analysis to: {json_file}")
-    
-    # Generate Logseq documentation
+    # Generate Logseq documentation BEFORE saving new analysis (so it can compare with previous)
     if generate_docs and logseq_graph:
         project_name = Path(project_path).name
         doc_gen = LogseqDocGenerator(logseq_graph)
         doc_gen.generate_documentation(result, project_name)
+    
+    # Save JSON report AFTER documentation (so resolved issue tracking works)
+    json_file = output_dir / "analysis.json"
+    with open(json_file, 'w') as f:
+        json.dump(_result_to_dict(result), f, indent=2, default=str)
+    console.print(f"\n💾 Saved analysis to: {json_file}")
     
     # Create tickets
     if create_tickets:

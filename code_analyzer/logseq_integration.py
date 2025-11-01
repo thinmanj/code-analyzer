@@ -2,9 +2,10 @@
 
 import sys
 import os
+import json
 from pathlib import Path
 from datetime import datetime
-from typing import List
+from typing import List, Set, Dict
 
 # Add logseq-python to path
 sys.path.insert(0, "/Volumes/Projects/logseq-python")
@@ -517,11 +518,44 @@ Code sections that need updates, refactoring, or enhancements.
         file_path.write_text(content)
         print(f"   📝 Wrote markdown: {file_path}")
     
+    def _load_previous_analysis(self, project_path: str) -> Set[str]:
+        """Load fingerprints from previous analysis."""
+        analysis_file = Path(project_path) / ".code-analyzer" / "analysis.json"
+        if not analysis_file.exists():
+            print(f"   📝 No previous analysis found")
+            return set()
+        
+        try:
+            with open(analysis_file, 'r') as f:
+                data = json.load(f)
+                issues = data.get('issues', [])
+                fingerprints = {issue.get('fingerprint') for issue in issues if 'fingerprint' in issue}
+                print(f"   📊 Loaded {len(fingerprints)} previous issue fingerprints")
+                return fingerprints
+        except Exception as e:
+            print(f"   ⚠️  Could not load previous analysis: {e}")
+            return set()
+    
+    def _find_resolved_issues(self, result: AnalysisResult, previous_fingerprints: Set[str]) -> List[Dict[str, str]]:
+        """Find issues that were resolved since last analysis."""
+        current_fingerprints = {issue.fingerprint() for issue in result.issues}
+        resolved_fingerprints = previous_fingerprints - current_fingerprints
+        
+        # We don't have the full issue details for resolved issues,
+        # so we just return the count and fingerprints
+        return [{"fingerprint": fp} for fp in resolved_fingerprints]
+    
     def _create_journal_entry(self, result: AnalysisResult, project_name: str):
         """Create a journal entry for tracking issues over time."""
         # Get today's date
         today = datetime.now()
         journal_date = today.strftime('%Y_%m_%d')
+        
+        # Load previous analysis to detect resolved issues
+        previous_fingerprints = self._load_previous_analysis(result.project_path)
+        resolved_issues = self._find_resolved_issues(result, previous_fingerprints)
+        if resolved_issues:
+            print(f"   ✅ Detected {len(resolved_issues)} resolved issue(s)")
         
         # Create journal directory if it doesn't exist
         journals_dir = self.graph_path / "journals"
@@ -549,6 +583,11 @@ Code sections that need updates, refactoring, or enhancements.
         
         if not high_issues:
             content += "  - ✅ No high/critical issues found!\n"
+        
+        # Add resolved issues section if any
+        if resolved_issues:
+            content += f"  - \n  - ### ✅ Resolved Since Last Analysis ({len(resolved_issues)}):\n"
+            content += f"  - {len(resolved_issues)} issue(s) were fixed or removed! #code-analysis/progress\n"
         
         # Add summary of improvement opportunities
         if result.improvements:
