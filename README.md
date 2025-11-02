@@ -1,5 +1,11 @@
 # Code Analyzer
 
+[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![GitHub issues](https://img.shields.io/github/issues/thinmanj/code-analyzer)](https://github.com/thinmanj/code-analyzer/issues)
+[![GitHub stars](https://img.shields.io/github/stars/thinmanj/code-analyzer)](https://github.com/thinmanj/code-analyzer/stargazers)
+
 **Deep source code analysis and documentation tool for multiple programming languages**
 
 Code Analyzer is a comprehensive tool that reads source code, understands its structure, identifies critical sections, detects potential issues, and generates detailed documentation. Currently supports **Python** and **JavaScript/TypeScript** with a language-agnostic architecture ready for Go, Java, and more.
