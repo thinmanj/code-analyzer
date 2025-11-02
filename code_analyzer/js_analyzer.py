@@ -79,6 +79,7 @@ class JavaScriptAnalyzer(LanguageAnalyzer):
             return None
         
         lines = content.split('\n')
+        self.file_content = content  # Store for complexity calculation
         
         # Extract module name from file path
         module_name = file_path.stem
@@ -310,16 +311,118 @@ class JavaScriptAnalyzer(LanguageAnalyzer):
         )
     
     def _estimate_complexity(self, func: JSFunction) -> int:
-        """Estimate cyclomatic complexity (simplified)."""
+        """Calculate cyclomatic complexity by counting decision points."""
         # Start with base complexity of 1
         complexity = 1
         
-        # Add 1 for each parameter (rough heuristic)
-        complexity += len(func.parameters) // 3
+        # Try to extract function body from file content
+        if hasattr(self, 'file_content'):
+            func_body = self._extract_function_body(func)
+            if func_body:
+                # Count decision points (cyclomatic complexity)
+                # Each of these adds one to complexity:
+                complexity += func_body.count('if ')
+                complexity += func_body.count('else if')
+                complexity += func_body.count('} else ')
+                complexity += func_body.count('for ')
+                complexity += func_body.count('for(')
+                complexity += func_body.count('while ')
+                complexity += func_body.count('while(')
+                complexity += func_body.count('case ')
+                complexity += func_body.count(' && ')  # Logical AND
+                complexity += func_body.count(' || ')  # Logical OR
+                complexity += func_body.count('catch ')
+                complexity += func_body.count('catch(')
+                complexity += func_body.count(' ? ')  # Ternary operator
+                
+                return max(1, complexity)
         
-        # This is a rough estimate - full implementation would
-        # parse the function body and count branches
+        # Fallback: rough estimate based on parameters
+        complexity += len(func.parameters) // 3
         return max(1, complexity)
+    
+    def _extract_function_body(self, func: JSFunction) -> Optional[str]:
+        """Extract the body of a function from file content."""
+        if not hasattr(self, 'file_content'):
+            return None
+        
+        lines = self.file_content.split('\n')
+        if func.line_start > len(lines):
+            return None
+        
+        # Get the function definition line
+        start_line = func.line_start - 1
+        
+        # Find the opening brace
+        brace_line = start_line
+        while brace_line < len(lines) and '{' not in lines[brace_line]:
+            brace_line += 1
+        
+        if brace_line >= len(lines):
+            return None
+        
+        # Find matching closing brace
+        full_text = '\n'.join(lines[start_line:])
+        brace_start = full_text.index('{') if '{' in full_text else -1
+        
+        if brace_start == -1:
+            return None
+        
+        # Extract body between braces
+        brace_end = self._find_matching_brace(full_text, brace_start)
+        if brace_end > brace_start:
+            return full_text[brace_start:brace_end + 1]
+        
+        return None
+    
+    def _find_matching_brace(self, text: str, start: int) -> int:
+        """Find the matching closing brace for an opening brace."""
+        if start >= len(text) or text[start] != '{':
+            return -1
+        
+        brace_count = 0
+        in_string = False
+        string_char = None
+        in_comment = False
+        
+        i = start
+        while i < len(text):
+            char = text[i]
+            
+            # Handle strings
+            if char in ['"', "'", '`'] and not in_comment:
+                if not in_string:
+                    in_string = True
+                    string_char = char
+                elif char == string_char:
+                    in_string = False
+            # Handle comments
+            elif not in_string:
+                if i + 1 < len(text) and text[i:i+2] == '//':
+                    # Single line comment - skip to end of line
+                    while i < len(text) and text[i] != '\n':
+                        i += 1
+                    continue
+                elif i + 1 < len(text) and text[i:i+2] == '/*':
+                    # Multi-line comment
+                    in_comment = True
+                    i += 2
+                    continue
+                elif in_comment and i + 1 < len(text) and text[i:i+2] == '*/':
+                    in_comment = False
+                    i += 2
+                    continue
+                elif not in_comment:
+                    if char == '{':
+                        brace_count += 1
+                    elif char == '}':
+                        brace_count -= 1
+                        if brace_count == 0:
+                            return i
+            
+            i += 1
+        
+        return -1
     
     def get_supported_extensions(self) -> List[str]:
         """Return JavaScript/TypeScript file extensions."""
