@@ -2,6 +2,7 @@
 
 from typing import List, Dict, Tuple
 from dataclasses import dataclass
+from pathlib import Path
 from .models import ModuleInfo, Issue
 
 
@@ -158,6 +159,34 @@ class TechDebtCalculator:
                         description=f"{len(long_param_methods)} methods with >5 parameters",
                         effort_hours=2.0,
                         impact="Increased coupling, harder to test"
+                    ))
+            
+            # Large functions/methods (language-agnostic)
+            for func in module.functions:
+                if func.lines_of_code and func.lines_of_code > 100:
+                    items.append(DebtItem(
+                        location=f"{module.name}.{func.name}",
+                        category='design',
+                        severity='medium',
+                        description=f"Large function ({func.lines_of_code} lines)",
+                        effort_hours=4.0,
+                        impact="Hard to understand and test"
+                    ))
+            
+            # JS/TS specific: Check for missing error handling in async functions
+            if module.file_path.endswith(('.js', '.ts', '.jsx', '.tsx')):
+                async_funcs_no_try = [
+                    f for f in module.functions 
+                    if f.is_async and 'try' not in (f.source_code or '').lower()
+                ]
+                if async_funcs_no_try and len(async_funcs_no_try) > 0:
+                    items.append(DebtItem(
+                        location=module.name,
+                        category='design',
+                        severity='medium',
+                        description=f"{len(async_funcs_no_try)} async functions lack error handling",
+                        effort_hours=1.0 * len(async_funcs_no_try),
+                        impact="Unhandled promise rejections"
                     ))
         
         return items

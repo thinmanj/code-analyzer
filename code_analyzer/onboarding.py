@@ -6,6 +6,7 @@ from pathlib import Path
 import re
 
 from .models import ModuleInfo, FunctionInfo, ClassInfo
+from .language_detection import LanguageDetector
 
 
 @dataclass
@@ -72,9 +73,14 @@ class OnboardingAnalyzer:
     def __init__(self, project_path: Path):
         self.project_path = project_path
         self.project_name = project_path.name
+        self.language_detector = LanguageDetector()
+        self.primary_language = None
     
     def generate_insights(self, modules: List[ModuleInfo]) -> OnboardingInsights:
         """Generate comprehensive onboarding insights."""
+        # Detect primary language
+        self.primary_language = self._detect_primary_language(modules)
+        
         overview = self._analyze_project_overview(modules)
         learning_path = self._generate_learning_path(modules)
         key_concepts = self._identify_key_concepts(modules)
@@ -91,6 +97,22 @@ class OnboardingAnalyzer:
             helpful_commands=commands
         )
     
+    def _detect_primary_language(self, modules: List[ModuleInfo]) -> str:
+        """Detect the primary programming language from modules."""
+        if not modules:
+            return 'python'
+        
+        # Count files by extension
+        lang_counts = {}
+        for module in modules:
+            lang = self.language_detector.detect_language_from_path(Path(module.file_path))
+            lang_counts[lang] = lang_counts.get(lang, 0) + 1
+        
+        # Return most common language
+        if lang_counts:
+            return max(lang_counts.items(), key=lambda x: x[1])[0]
+        return 'python'
+    
     def _analyze_project_overview(self, modules: List[ModuleInfo]) -> ProjectOverview:
         """Extract high-level project information."""
         total_files = len(modules)
@@ -103,6 +125,8 @@ class OnboardingAnalyzer:
         
         # Categorize common frameworks/libraries
         technologies = []
+        
+        # Python frameworks
         if any('django' in imp for imp in all_imports):
             technologies.append('Django (web framework)')
         if any('flask' in imp for imp in all_imports):
@@ -119,6 +143,24 @@ class OnboardingAnalyzer:
             technologies.append('HTTP client')
         if any('sqlalchemy' in imp for imp in all_imports):
             technologies.append('SQLAlchemy (database ORM)')
+        
+        # JavaScript/TypeScript frameworks
+        if any('react' in imp for imp in all_imports):
+            technologies.append('React (UI library)')
+        if any('vue' in imp for imp in all_imports):
+            technologies.append('Vue.js (framework)')
+        if any('angular' in imp for imp in all_imports):
+            technologies.append('Angular (framework)')
+        if any('express' in imp for imp in all_imports):
+            technologies.append('Express.js (web framework)')
+        if any('next' in imp for imp in all_imports):
+            technologies.append('Next.js (React framework)')
+        if any('jest' in imp or 'vitest' in imp for imp in all_imports):
+            technologies.append('Jest/Vitest (testing)')
+        if any('axios' in imp or 'fetch' in imp for imp in all_imports):
+            technologies.append('HTTP client (axios/fetch)')
+        if any('redux' in imp or 'zustand' in imp for imp in all_imports):
+            technologies.append('State management')
         
         # Estimate complexity
         avg_lines_per_file = total_lines / max(total_files, 1)
@@ -170,13 +212,20 @@ class OnboardingAnalyzer:
         test_modules = []
         
         for module in modules:
-            # Identify entry points
+            # Identify entry points (language-specific)
             if any(func.name == 'main' for func in module.functions):
                 entry_points.append((module.file_path, "Has main() function - application entry point"))
             elif '__main__' in module.name:
                 entry_points.append((module.file_path, "Main module - run with 'python -m'"))
             elif 'cli' in module.name.lower():
                 entry_points.append((module.file_path, "Command-line interface"))
+            # JS/TS entry points
+            elif 'index' in module.name.lower() or 'main' in module.name.lower():
+                entry_points.append((module.file_path, "Main entry file"))
+            elif 'app' in module.name.lower() and len(module.classes) > 0:
+                entry_points.append((module.file_path, "Application root component"))
+            elif 'server' in module.name.lower():
+                entry_points.append((module.file_path, "Server entry point"))
             
             # Identify test modules
             if 'test' in module.name.lower() or 'tests' in module.file_path:
@@ -386,13 +435,19 @@ class OnboardingAnalyzer:
     def _generate_quick_start_tips(self, modules: List[ModuleInfo]) -> List[str]:
         """Generate quick start tips for developers."""
         tips = []
+        is_python = self.primary_language == 'python'
+        is_js_ts = self.primary_language in ['javascript', 'typescript']
         
-        # Look for setup/install info
-        setup_files = ['setup.py', 'pyproject.toml', 'requirements.txt']
-        for module in modules:
-            if any(sf in module.file_path for sf in setup_files):
-                tips.append("Install dependencies first - check setup.py or requirements.txt")
-                break
+        # Language-specific setup instructions
+        if is_python:
+            setup_files = ['setup.py', 'pyproject.toml', 'requirements.txt']
+            for module in modules:
+                if any(sf in module.file_path for sf in setup_files):
+                    tips.append("Install dependencies: pip install -r requirements.txt or pip install -e .")
+                    break
+        elif is_js_ts:
+            tips.append("Install dependencies: npm install or yarn install")
+            tips.append("Check package.json for available scripts (npm run <script>)")
         
         # Look for configuration
         if any('config' in m.name.lower() or 'settings' in m.name.lower() for m in modules):
@@ -400,7 +455,10 @@ class OnboardingAnalyzer:
         
         # Look for tests
         if any('test' in m.name.lower() for m in modules):
-            tips.append("Run tests to verify setup: pytest or python -m pytest")
+            if is_python:
+                tips.append("Run tests: pytest or python -m pytest")
+            elif is_js_ts:
+                tips.append("Run tests: npm test or yarn test")
         
         # Look for CLI
         if any('cli' in m.name.lower() for m in modules):
@@ -416,7 +474,10 @@ class OnboardingAnalyzer:
             tips.append("Read docs/ directory for detailed documentation")
         
         # Generic tips
-        tips.append("Start by reading docstrings in main classes and functions")
+        if is_python:
+            tips.append("Start by reading docstrings in main classes and functions")
+        elif is_js_ts:
+            tips.append("Start by reading JSDoc comments in main components and functions")
         tips.append("Use an IDE with 'go to definition' to navigate the codebase")
         
         return tips
@@ -424,6 +485,8 @@ class OnboardingAnalyzer:
     def _identify_common_pitfalls(self, modules: List[ModuleInfo]) -> List[str]:
         """Identify potential pitfalls for new developers."""
         pitfalls = []
+        is_python = self.primary_language == 'python'
+        is_js_ts = self.primary_language in ['javascript', 'typescript']
         
         # Check complexity
         high_complexity_modules = [m for m in modules if m.complexity > 20]
@@ -448,43 +511,74 @@ class OnboardingAnalyzer:
             for m in modules
         )
         if has_async:
-            pitfalls.append("Contains async/await code - understand Python asyncio first")
+            if is_python:
+                pitfalls.append("Contains async/await code - understand Python asyncio first")
+            elif is_js_ts:
+                pitfalls.append("Contains async/await code - understand Promises and async patterns")
         
-        # Check for metaprogramming
-        for module in modules:
-            if any('meta' in cls.name.lower() for cls in module.classes):
-                pitfalls.append("Uses metaprogramming - advanced Python concepts")
-                break
+        # Language-specific pitfalls
+        if is_python:
+            for module in modules:
+                if any('meta' in cls.name.lower() for cls in module.classes):
+                    pitfalls.append("Uses metaprogramming - advanced Python concepts")
+                    break
+        elif is_js_ts:
+            # Check for React hooks patterns
+            all_imports_str = ' '.join(all_imports)
+            if 'react' in all_imports_str.lower():
+                pitfalls.append("Uses React - understand hooks (useState, useEffect) and component lifecycle")
+            # Check for TypeScript
+            if any(m.file_path.endswith(('.ts', '.tsx')) for m in modules):
+                pitfalls.append("Uses TypeScript - understand type system and interfaces")
         
         return pitfalls
     
     def _suggest_helpful_commands(self, modules: List[ModuleInfo]) -> List[Tuple[str, str]]:
         """Suggest helpful commands for exploring the codebase."""
         commands = []
+        is_python = self.primary_language == 'python'
+        is_js_ts = self.primary_language in ['javascript', 'typescript']
         
         # Standard exploration commands
         commands.append(("tree -L 2", "View project structure"))
-        commands.append(("find . -name '*.py' | wc -l", "Count Python files"))
-        commands.append(("grep -r 'class ' --include='*.py' | wc -l", "Count classes"))
+        
+        if is_python:
+            commands.append(("find . -name '*.py' | wc -l", "Count Python files"))
+            commands.append(("grep -r 'class ' --include='*.py' | wc -l", "Count classes"))
+        elif is_js_ts:
+            commands.append(("find . -name '*.js' -o -name '*.ts' | wc -l", "Count JS/TS files"))
+            commands.append(("grep -r 'class ' --include='*.js' --include='*.ts' | wc -l", "Count classes"))
         
         # Test commands
         if any('test' in m.name.lower() for m in modules):
-            commands.append(("pytest -v", "Run tests with verbose output"))
-            commands.append(("pytest --cov", "Run tests with coverage"))
+            if is_python:
+                commands.append(("pytest -v", "Run tests with verbose output"))
+                commands.append(("pytest --cov", "Run tests with coverage"))
+            elif is_js_ts:
+                commands.append(("npm test", "Run tests"))
+                commands.append(("npm run test:coverage", "Run tests with coverage"))
         
         # CLI commands
         if any('cli' in m.name.lower() for m in modules):
-            cli_modules = [m for m in modules if 'cli' in m.name.lower()]
-            if cli_modules:
-                module_name = cli_modules[0].name.replace('.', '/')
-                commands.append((f"python -m {module_name} --help", "View CLI help"))
+            if is_python:
+                cli_modules = [m for m in modules if 'cli' in m.name.lower()]
+                if cli_modules:
+                    module_name = cli_modules[0].name.replace('.', '/')
+                    commands.append((f"python -m {module_name} --help", "View CLI help"))
+        
+        # Build/development commands
+        if is_js_ts:
+            commands.append(("npm run dev", "Start development server"))
+            commands.append(("npm run build", "Build for production"))
         
         # Code quality
-        commands.append(("pylint *.py", "Check code quality"))
-        commands.append(("radon cc . -a", "Calculate cyclomatic complexity"))
-        
-        # Documentation
-        commands.append(("pydoc <module>", "View module documentation"))
+        if is_python:
+            commands.append(("pylint *.py", "Check code quality"))
+            commands.append(("radon cc . -a", "Calculate cyclomatic complexity"))
+            commands.append(("pydoc <module>", "View module documentation"))
+        elif is_js_ts:
+            commands.append(("npm run lint", "Check code quality"))
+            commands.append(("npm run type-check", "TypeScript type checking"))
         
         return commands
 
