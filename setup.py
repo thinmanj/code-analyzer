@@ -10,7 +10,7 @@ setup(
     description="Deep source code analysis and documentation tool",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/code-analyzer",
+    url="https://github.com/thinmanj/code-analyzer",
     packages=find_packages(),
     classifiers=[
         "Development Status :: 3 - Alpha",
