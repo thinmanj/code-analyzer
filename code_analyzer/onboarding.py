@@ -105,7 +105,7 @@ class OnboardingAnalyzer:
         # Count files by extension
         lang_counts = {}
         for module in modules:
-            lang = self.language_detector.detect_language_from_path(Path(module.file_path))
+            lang = self.language_detector.get_language_for_file(Path(module.file_path))
             lang_counts[lang] = lang_counts.get(lang, 0) + 1
         
         # Return most common language
