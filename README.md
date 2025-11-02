@@ -1,8 +1,18 @@
 # Code Analyzer
 
-**Deep source code analysis and documentation tool for Python projects**
+**Deep source code analysis and documentation tool for multiple programming languages**
 
-Code Analyzer is a comprehensive tool that reads source code, understands its structure, identifies critical sections, detects potential issues, and generates detailed documentation. It integrates with Logseq for documentation and repo-tickets for issue tracking.
+Code Analyzer is a comprehensive tool that reads source code, understands its structure, identifies critical sections, detects potential issues, and generates detailed documentation. Currently supports **Python** and **JavaScript/TypeScript** with a language-agnostic architecture ready for Go, Java, and more.
+
+## Supported Languages
+
+| Language | Support | Features |
+|----------|---------|----------|
+| **Python** | ✅ Full | All 16 features, AST-based parsing |
+| **JavaScript/TypeScript** | ✅ Full | All 16 features, regex-based parsing + complexity calculation |
+| **Go, Java, Ruby, etc.** | 🔄 Planned | Extensible architecture ready |
+
+**Multi-Language Intelligence**: Onboarding, tech debt, and performance analysis automatically adapt to detect language-specific patterns (React hooks, async/await, etc.).
 
 ## Features
 
