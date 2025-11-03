@@ -22,7 +22,7 @@ jobs:
     
     - name: Install code-analyzer
       run: |
-        pip install code-analyzer
+        pip install -e .
     
     - name: Run Analysis
       run: |
