@@ -4,7 +4,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name="code-analyzer",
+    name="smart-code-analyzer",
     version="0.5.0",
     author="Julio",
     description="Deep source code analysis and documentation tool",
