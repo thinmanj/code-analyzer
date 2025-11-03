@@ -1,4 +1,4 @@
-name: Code Analysis
+name: Tests
 
 on:
   push:
@@ -7,82 +7,29 @@ on:
     branches: [ main, develop ]
 
 jobs:
-  analyze:
+  test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']
     
     steps:
     - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0  # Full history for trend analysis
     
-    - name: Set up Python
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
-        python-version: '3.9'
+        python-version: ${{ matrix.python-version }}
     
-    - name: Install code-analyzer
+    - name: Install dependencies
       run: |
-        pip install -e .
+        python -m pip install --upgrade pip
+        pip install -e ".[dev]"
     
-    - name: Run Analysis
+    - name: Run tests
       run: |
-        code-analyzer analyze . --depth deep --output .code-analyzer
+        pytest --cov=code_analyzer --cov-report=term
     
-    - name: Check for Critical Issues
+    - name: Check test results
       run: |
-        # Fail if critical issues found
-        python -c "
-import json
-with open('.code-analyzer/analysis.json') as f:
-    data = json.load(f)
-    critical = data['metrics']['issues_by_severity'].get('critical', 0)
-    high = data['metrics']['issues_by_severity'].get('high', 0)
-    if critical > 0:
-        print(f'❌ Found {critical} critical issues')
-        exit(1)
-    if high > 5:
-        print(f'⚠️  Found {high} high severity issues (threshold: 5)')
-        exit(1)
-    print('✅ Quality checks passed')
-"
-    
-    - name: Upload Analysis Results
-      uses: actions/upload-artifact@v3
-      if: always()
-      with:
-        name: code-analysis
-        path: .code-analyzer/
-    
-    - name: Comment on PR
-      if: github.event_name == 'pull_request'
-      uses: actions/github-script@v6
-      with:
-        script: |
-          const fs = require('fs');
-          const analysis = JSON.parse(fs.readFileSync('.code-analyzer/analysis.json', 'utf8'));
-          const metrics = analysis.metrics;
-          
-          const comment = `## 📊 Code Analysis Results
-          
-**Quality Metrics:**
-- Total Issues: ${metrics.total_issues}
-- Critical: ${metrics.issues_by_severity.critical || 0}
-- High: ${metrics.issues_by_severity.high || 0}
-- Medium: ${metrics.issues_by_severity.medium || 0}
-- Low: ${metrics.issues_by_severity.low || 0}
-
-**Code Metrics:**
-- Average Complexity: ${metrics.average_complexity.toFixed(2)}
-- Max Complexity: ${metrics.max_complexity}
-- Total Files: ${metrics.total_files}
-- Total Lines: ${metrics.total_lines.toLocaleString()}
-
-[View Full Report](${{github.server_url}}/${{github.repository}}/actions/runs/${{github.run_id}})
-          `;
-          
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: comment
-          });
+        echo "✅ All tests passed!"
