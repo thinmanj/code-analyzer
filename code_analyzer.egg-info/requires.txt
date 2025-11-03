@@ -2,6 +2,7 @@ click>=8.0.0
 pyyaml>=6.0
 radon>=6.0.0
 rich>=13.0.0
+tqdm>=4.65.0
 
 [dev]
 pytest>=7.0.0

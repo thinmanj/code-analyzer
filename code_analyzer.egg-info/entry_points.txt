@@ -1,3 +1,2 @@
 [console_scripts]
 code-analyzer = code_analyzer.cli:main
-
